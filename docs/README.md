@@ -1,5 +1,7 @@
 # Go-Wechaty-Bot XP PROTOCOL
 
+> 仅供学习使用，*请勿用于非法用途*！
+
 ## Info
 
 1. This is Use puppet-xp ,Not web4u
@@ -125,3 +127,9 @@
 
 1. TODO || example.yaml
 2. Update.log
+
+## Contact me
+
+Reply to group chat with us
+
+![](Image/bot.png)
