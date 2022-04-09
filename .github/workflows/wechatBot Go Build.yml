@@ -59,7 +59,7 @@ jobs:
         name: Make release
         uses: softprops/action-gh-release@v1
         with:
-          files: "bin/**"
+          files: "Server/bin/**"
           body_path: docs/Update.md
           name: ${{ github.event.inputs.releaseName }}
           tag_name: ${{ github.event.inputs.tagName }}
