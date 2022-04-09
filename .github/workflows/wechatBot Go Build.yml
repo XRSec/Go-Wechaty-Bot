@@ -6,7 +6,7 @@ on:
       releaseName:
         description: 'Set release name'
         required: true
-        default: "Use Go & SDK Wechaty & Protocol XP
+        default: "Use Go & SDK Wechaty & Protocol XP"
       tagName:
         description: 'Set tag name'
         required: false
@@ -59,7 +59,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: "bin/**"
-          body_path: .github/body.txt
+          body_path: docs/Update.md
           name: ${{ github.event.inputs.releaseName }}
           tag_name: ${{ github.event.inputs.tagName }}
           draft: false
