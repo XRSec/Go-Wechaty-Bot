@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseName:
+        description: 'Set release name'
+        required: true
+        default: "Use Go & SDK Wechaty & Protocol XP
+      tagName:
+        description: 'Set tag name'
+        required: false
+        type: string
+  watch:
+    types: [started]
+
+jobs:
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Private Actions Checkout
+        uses: actions/checkout@v2
+      -
+        name: Get Data
+        id: time
+        run: echo "::set-output name=dir::$(date +'%Y-%m-%d/%H:%M:%S')"
+      -
+        name: Get commitId
+        id: commitId
+        run:
+          echo "::set-output name=dir::$(git rev-parse HEAD)"
+      -
+        name: Build with xgo
+        uses: crazy-max/ghaction-xgo@v1
+        with:
+          xgo_version: latest
+          go_version: ${{ matrix.go_version }}
+          dest: bin
+          prefix: wechatBot
+          targets: windows/386,windows/amd64, windows/arm64
+          v: false
+          x: false
+          race: false
+          ldflags: -s -w -X main.buildTime=${{ steps.time.outputs.dir }} -X main.version=${{ github.event.inputs.tagName }} -X main.commitId=${{ steps.commitId.outputs.dir }} -X main.author=XRSec
+          buildmode: default
+      -
+        name: Delete old Releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          repo: ${{ github.repository }}
+          keep_latest: 3
+          delete_tag_pattern: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      -
+        name: Make release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "bin/**"
+          body_path: .github/body.txt
+          name: ${{ github.event.inputs.releaseName }}
+          tag_name: ${{ github.event.inputs.tagName }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
