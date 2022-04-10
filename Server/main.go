@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	. "github.com/wechaty/go-wechaty/wechaty"
 	wp "github.com/wechaty/go-wechaty/wechaty-puppet"
@@ -14,12 +13,13 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	. "wechatBot/bot-service"
+	. "wechatBot/api"
 	. "wechatBot/data"
 )
 
 var (
-	err error
+	err   error
+	reply string
 )
 
 func init() {
@@ -162,12 +162,19 @@ func OnMessage(context *Context, message *user.Message) {
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 	}
-
 	if message.Type() == schemas.MessageTypeText {
-		if messages.Status {
-			if message.MentionSelf() {
-				log.Printf("%s@我 %s", messages.UserName, strings.Replace(strings.Replace(message.Text(), "@", "", 1), viper.GetString("bot.name"), "", 1))
-				DingMessage(fmt.Sprintf("%s @我 %s", messages.AutoInfo, strings.Replace(strings.Replace(message.Text(), "@", "", 1), viper.GetString("bot.name"), "", 1)))
+		if messages.Status { // 群聊
+			if messages.AtMe { // @我是我操作
+				messages = WXAPI(messages)
+				DingMessage(messages.AutoInfo)
+				if messages.Reply != "" {
+					SayMsg(message, messages.Reply)
+				} else {
+					messages = TulingMessage(messages)
+					if messages.Reply != "" {
+						SayMsg(message, messages.Reply)
+					}
+				}
 			}
 			if strings.Contains(message.Text(), "基于你的优异表现，+") {
 				SayMsg(message, `
@@ -176,11 +183,12 @@ func OnMessage(context *Context, message *user.Message) {
 				`)
 			}
 			// TODO 设置TXT 拦截预处理
-			log.Printf("%s 说: %s", messages.AutoInfo, message.Text())
+			log.Println(messages.AutoInfo)
 		}
 		if strings.Contains("加群", message.Text()) {
 			// 邀请进群
 		}
+		go ExportMessages(messages)
 	}
 }
 
