@@ -37,7 +37,7 @@
    @set WECHATY_PUPPET_SERVICE_TOKEN=insecure_34bf8353-0874-4b29-851d-e8a2502fc747
    @set WECHATY_PUPPET_SERVER_PORT=25000
    ```
-4. Install the Software ([**Wechat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
+4. Install the Software ([**WeChat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
    ```bash
    > node-v16.exe WeChatSetup-v3.3.0.115.exe
    > @cnpm install -g wechaty@1.11 wechaty-puppet-xp
