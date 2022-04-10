@@ -18,8 +18,7 @@ import (
 )
 
 var (
-	err   error
-	reply string
+	err error
 )
 
 func init() {
@@ -40,7 +39,7 @@ func init() {
 	viper.Set("exePath", exePath)
 }
 
-func onScan(context *Context, qrCode string, status schemas.ScanStatus, data string) {
+func onScan(_ *Context, qrCode string, status schemas.ScanStatus, data string) {
 	log.Printf("%s[Scan] %s %s %s\n", viper.GetString("info"), qrCode, status, data)
 }
 
@@ -48,7 +47,7 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 	@method onLogin 当机器人成功登陆后，会触发事件，并会在事件中传递当前登陆机器人的信息
 	@param {*} user
 */
-func onlogin(ctx *Context, user *user.ContactSelf) {
+func onLogin(_ *Context, user *user.ContactSelf) {
 	log.Printf(`
                            //
                \\         //
@@ -72,7 +71,7 @@ func onlogin(ctx *Context, user *user.ContactSelf) {
 @method onLogout 当机器人检测到登出的时候，会触发事件，并会在事件中传递机器人的信息。
 @param {*} user
 */
-func onLogout(ontext *Context, user *user.ContactSelf, reason string) {
+func onLogout(_ *Context, user *user.ContactSelf, reason string) {
 	log.Println("========================onLogout👇========================")
 	DingMessage(user.Name() + "账号已退出登录, 请检查账号!" + reason)
 }
@@ -81,7 +80,7 @@ func onLogout(ontext *Context, user *user.ContactSelf, reason string) {
   @method onRoomInvite 当收到群邀请的时候，会触发这个事件。
   @param {*} user
 */
-func onRoomInvite(ontext *Context, roomInvitation *user.RoomInvitation) {
+func onRoomInvite(_ *Context, roomInvitation *user.RoomInvitation) {
 	log.Println("========================onRoomInvite👇========================")
 	if err = roomInvitation.Accept(); err != nil {
 		ErrorFormat("Accept Room Invitation", err)
@@ -94,7 +93,7 @@ func onRoomInvite(ontext *Context, roomInvitation *user.RoomInvitation) {
 	@method onRoomTopic 当有人修改群名称的时候会触发这个事件。
 	@param {*} user
 */
-func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic string, changer IContact, date time.Time) {
+func onRoomTopic(*Context, *user.Room, string, string, IContact, time.Time) {
 	log.Println("========================onRoomTopic👇========================")
 }
 
@@ -102,19 +101,19 @@ func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic st
 	进入房间监听回调 room-群聊 inviteeList-受邀者名单 inviter-邀请者
 	判断配置项群组id数组中是否存在该群聊id
 */
-func onRoomJoin(context *Context, room *user.Room, inviteeList []IContact, inviter IContact, date time.Time) {
+func onRoomJoin(*Context, *user.Room, []IContact, IContact, time.Time) {
 }
 
 /*
 	@method onRoomleave 当机器人把群里某个用户移出群聊的时候会触发这个时间。用户主动退群是无法检测到的。
 	@param {*} user
 */
-func onRoomleave(context *Context, room *user.Room, leaverList []IContact, remover IContact, date time.Time) {
+func onRoomleave(_ *Context, _ *user.Room, _ []IContact, remover IContact, _ time.Time) {
 	log.Println("========================onRoomleave👇========================")
 	log.Printf("用户[%s]被踢出去聊", remover.Name())
 }
 
-func onFriendship(context *Context, friendship *user.Friendship) {
+func onFriendship(_ *Context, friendship *user.Friendship) {
 	switch friendship.Type() {
 	case 1:
 	//FriendshipTypeUnknown
@@ -149,12 +148,12 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 	@method onHeartbeat 获取机器人的心跳。
 	@param {*} user
 */
-func onHeartbeat(context *Context, data string) {
+func onHeartbeat(_ *Context, data string) {
 	log.Println("========================onHeartbeat👇========================")
 	log.Printf("获取机器人的心跳: %s", data)
 }
 
-func OnMessage(context *Context, message *user.Message) {
+func OnMessage(_ *Context, message *user.Message) {
 	messages := EncodeMessage(message)
 	if message.Self() {
 		return
@@ -192,7 +191,7 @@ func OnMessage(context *Context, message *user.Message) {
 	}
 }
 
-func onError(context *Context, err error) {
+func onError(_ *Context, err error) {
 	ErrorFormat("机器人错误", err)
 }
 
@@ -212,7 +211,7 @@ func main() {
 		log.Printf("Endpoint: %s", viper.GetString("wechaty.wechaty_puppet_endpoint"))
 
 		bot.OnScan(onScan).
-			OnLogin(onlogin).
+			OnLogin(onLogin).
 			OnLogout(onLogout).
 			OnMessage(OnMessage).
 			OnRoomInvite(onRoomInvite).

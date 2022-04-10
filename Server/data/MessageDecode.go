@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-var ()
-
 type (
 	MessageInfo struct {
 		Data     string
