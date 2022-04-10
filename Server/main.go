@@ -22,17 +22,6 @@ var (
 	err error
 )
 
-type (
-	MessageInfo struct {
-		Status   bool
-		RoomName string
-		RoomID   string
-		UserName string
-		UserID   string
-		AutoInfo string
-	}
-)
-
 func init() {
 	// 设置日志格式
 	log.SetPrefix("[xrsec] [\033[01;33m➜\033[0m] ") // 设置日志前缀
@@ -165,12 +154,8 @@ func onHeartbeat(context *Context, data string) {
 	log.Printf("获取机器人的心跳: %s", data)
 }
 
-func onError(context *Context, err error) {
-	ErrorFormat("机器人错误", err)
-}
-
-func onMessage(context *Context, message *user.Message) {
-	messages := encodeMessage(message)
+func OnMessage(context *Context, message *user.Message) {
+	messages := EncodeMessage(message)
 	if message.Self() {
 		return
 	}
@@ -199,28 +184,8 @@ func onMessage(context *Context, message *user.Message) {
 	}
 }
 
-func encodeMessage(message *user.Message) MessageInfo {
-	//var result []byte
-	UserName := message.From().Name()
-	UserID := message.From().ID()
-	messages := MessageInfo{
-		Status:   false,
-		UserName: UserName,
-		UserID:   UserID,
-		AutoInfo: "用户ID: [" + UserID + "] 用户名称: [" + UserName + "]",
-	}
-	if message.Room() != nil {
-		messages.Status = true
-		messages.RoomID = message.Room().ID()
-		messages.RoomName = strings.Replace(strings.Replace(message.Room().String(), "Room<", "", 1), ">", "", 1)
-		messages.AutoInfo = "群聊ID: [" + messages.RoomID + "] 群聊名称: [" + messages.RoomName + "] " + messages.AutoInfo
-	}
-	//if result, err = json.Marshal(messages); err != nil {
-	//	fmt.Println(err)
-	//}
-	//jsonStringData := string(result)
-	// 这里保存json数据
-	return messages
+func onError(context *Context, err error) {
+	ErrorFormat("机器人错误", err)
 }
 
 func main() {
@@ -241,7 +206,7 @@ func main() {
 		bot.OnScan(onScan).
 			OnLogin(onlogin).
 			OnLogout(onLogout).
-			OnMessage(onMessage).
+			OnMessage(OnMessage).
 			OnRoomInvite(onRoomInvite).
 			OnRoomTopic(onRoomTopic).
 			OnRoomJoin(onRoomJoin).

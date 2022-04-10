@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/spf13/viper v1.10.1
+	github.com/tidwall/gjson v1.14.0
 	github.com/wechaty/go-wechaty v0.3.6
 )
 
@@ -26,6 +27,8 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tuotoo/qrcode v0.0.0-20190222102259-ac9c44189bf2 // indirect
 	github.com/wechaty/go-grpc v0.18.12 // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
