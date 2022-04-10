@@ -18,7 +18,10 @@ import (
 )
 
 var (
-	err error
+	err        error
+	context    *Context
+	friendship *user.Friendship
+	room       *user.Room
 )
 
 func init() {
@@ -39,7 +42,7 @@ func init() {
 	viper.Set("exePath", exePath)
 }
 
-func onScan(_ *Context, qrCode string, status schemas.ScanStatus, data string) {
+func onScan(context *Context, qrCode string, status schemas.ScanStatus, data string) {
 	log.Printf("%s[Scan] %s %s %s\n", viper.GetString("info"), qrCode, status, data)
 }
 
@@ -47,7 +50,7 @@ func onScan(_ *Context, qrCode string, status schemas.ScanStatus, data string) {
 	@method onLogin 当机器人成功登陆后，会触发事件，并会在事件中传递当前登陆机器人的信息
 	@param {*} user
 */
-func onLogin(_ *Context, user *user.ContactSelf) {
+func onLogin(context *Context, user *user.ContactSelf) {
 	log.Printf(`
                            //
                \\         //
@@ -71,7 +74,7 @@ func onLogin(_ *Context, user *user.ContactSelf) {
 @method onLogout 当机器人检测到登出的时候，会触发事件，并会在事件中传递机器人的信息。
 @param {*} user
 */
-func onLogout(_ *Context, user *user.ContactSelf, reason string) {
+func onLogout(context *Context, user *user.ContactSelf, reason string) {
 	log.Println("========================onLogout👇========================")
 	DingMessage(user.Name() + "账号已退出登录, 请检查账号!" + reason)
 }
@@ -80,7 +83,7 @@ func onLogout(_ *Context, user *user.ContactSelf, reason string) {
   @method onRoomInvite 当收到群邀请的时候，会触发这个事件。
   @param {*} user
 */
-func onRoomInvite(_ *Context, roomInvitation *user.RoomInvitation) {
+func onRoomInvite(context *Context, roomInvitation *user.RoomInvitation) {
 	log.Println("========================onRoomInvite👇========================")
 	if err = roomInvitation.Accept(); err != nil {
 		ErrorFormat("Accept Room Invitation", err)
@@ -93,7 +96,7 @@ func onRoomInvite(_ *Context, roomInvitation *user.RoomInvitation) {
 	@method onRoomTopic 当有人修改群名称的时候会触发这个事件。
 	@param {*} user
 */
-func onRoomTopic(*Context, *user.Room, string, string, IContact, time.Time) {
+func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic string, changer IContact, date time.Time) {
 	log.Println("========================onRoomTopic👇========================")
 }
 
@@ -101,19 +104,20 @@ func onRoomTopic(*Context, *user.Room, string, string, IContact, time.Time) {
 	进入房间监听回调 room-群聊 inviteeList-受邀者名单 inviter-邀请者
 	判断配置项群组id数组中是否存在该群聊id
 */
-func onRoomJoin(*Context, *user.Room, []IContact, IContact, time.Time) {
+func onRoomJoin(context *Context, room *user.Room, inviteeList []IContact, inviter IContact, date time.Time) {
 }
 
 /*
 	@method onRoomleave 当机器人把群里某个用户移出群聊的时候会触发这个时间。用户主动退群是无法检测到的。
 	@param {*} user
 */
-func onRoomleave(_ *Context, _ *user.Room, _ []IContact, remover IContact, _ time.Time) {
+func onRoomleave(context *Context, _ *user.Room, _ []IContact, remover IContact, _ time.Time) {
 	log.Println("========================onRoomleave👇========================")
 	log.Printf("用户[%s]被踢出去聊", remover.Name())
 }
 
-func onFriendship(_ *Context, friendship *user.Friendship) {
+func onFriendship(context *Context, friendship *user.Friendship) {
+	log.Println("========================onFriendship👇========================")
 	switch friendship.Type() {
 	case 1:
 	//FriendshipTypeUnknown
@@ -163,17 +167,24 @@ func OnMessage(_ *Context, message *user.Message) {
 	}
 	if message.Type() == schemas.MessageTypeText {
 		if messages.Status { // 群聊
-			if messages.AtMe { // @我是我操作
+			if messages.AtMe { // @我 的我操作
+				if strings.Contains(messages.Content, "add") { // add 指令 （加好友）
+					if messages.UserID == viper.GetString("bot.adminid") {
+						//AddFriend(strings.Replace(strings.Replace(messages.Content, "add", "", 1), "@", "", 1), friendship)
+					}
+				}
+				// 优先微信开放平台API
 				messages = WXAPI(messages)
-				DingMessage(messages.AutoInfo)
 				if messages.Reply != "" {
 					SayMsg(message, messages.Reply)
 				} else {
+					// 图灵API
 					messages = TulingMessage(messages)
 					if messages.Reply != "" {
 						SayMsg(message, messages.Reply)
 					}
 				}
+				DingMessage(messages.AutoInfo)
 			}
 			if strings.Contains(message.Text(), "基于你的优异表现，+") {
 				SayMsg(message, `
@@ -219,8 +230,9 @@ func main() {
 			OnRoomJoin(onRoomJoin).
 			OnRoomLeave(onRoomleave).
 			OnFriendship(onFriendship).
-			//OnHeartbeat(onHeartbeat).
+			OnHeartbeat(onHeartbeat).
 			OnError(onError)
+		//Contact()
 		//bot.DaemonStart()
 
 		if err := bot.Start(); err != nil {
