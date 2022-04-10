@@ -1,4 +1,13 @@
+## 04/10
+- 添加日志输出 json 格式
+
+- ```diff
+  -- AutoInfo: "用户ID: [" + UserID + "] 用户名称: [" + UserName + "]" + message.Text() +"]",
+  ++ AutoInfo: message.Text(),
+  ```
+
 ## 04/09
+
 - 添加失败重试机制, 暂时没有奇怪的错误验证
 - 添加退出保存配置的功能
 - 添加自动编译功能
