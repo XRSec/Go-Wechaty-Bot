@@ -67,7 +67,7 @@ func WXAPI(msg MessageInfo) MessageInfo {
 								log.Printf("解析 aibot 信息成功!")
 								if answer.Answer != "" {
 									msg.Reply = answer.Answer
-									log.Printf("回复信息: %+v", msg.Reply)
+									log.Printf("wx 机器人 回复信息: %+v", msg.Reply)
 									msg.AutoInfo += " 回复: [" + msg.Reply + "]"
 									//log.Printf("WXopenai.TOKEN:[%s] msg.UserName:[%s], msg.UserID:[%s] wxSession.Signature:[%s] msg.Content:[%v] WXopenai.ENV:[%s] answer:[%v]", viper.GetString("WXopenai.TOKEN"), msg.UserName, msg.UserID, wxSession.Signature, msg.Content, viper.GetString("WXopenai.ENV"), answer)
 								}

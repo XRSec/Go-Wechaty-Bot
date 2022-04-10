@@ -36,7 +36,7 @@ func TulingMessage(msg MessageInfo) MessageInfo {
 					return msg
 				} else {
 					msg.Reply = tulingBotResult.Text
-					log.Printf("回复信息: %+v", msg.Reply)
+					log.Printf("图灵机器人 回复信息: %+v", msg.Reply)
 					msg.AutoInfo += " 回复: [" + msg.Reply + "]"
 					return msg
 				}
