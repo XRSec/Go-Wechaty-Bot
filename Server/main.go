@@ -85,7 +85,7 @@ func onlogin(ctx *Context, user *user.ContactSelf) {
 */
 func onLogout(ontext *Context, user *user.ContactSelf, reason string) {
 	log.Println("========================onLogout👇========================")
-	DingMessage(user.Name() + "账号已退出登录, 请检查账号!" + reason)
+	DingMessage(user.Name() + "账号已退出登录, 请检查账号状态!" + reason)
 }
 
 /*
@@ -96,7 +96,7 @@ func onRoomInvite(ontext *Context, roomInvitation *user.RoomInvitation) {
 	log.Println("========================onRoomInvite👇========================")
 	if err = roomInvitation.Accept(); err != nil {
 		ErrorFormat("Accept Room Invitation", err)
-		//	好像有点问题，群聊设置了邀请确认就用不了
+		// TODO	好像有点问题，群聊设置了邀请确认就用不了
 	}
 	log.Println(roomInvitation.String())
 }
@@ -107,6 +107,7 @@ func onRoomInvite(ontext *Context, roomInvitation *user.RoomInvitation) {
 */
 func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic string, changer IContact, date time.Time) {
 	log.Println("========================onRoomTopic👇========================")
+	//	暂时未测试
 }
 
 /*
@@ -114,6 +115,7 @@ func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic st
 	判断配置项群组id数组中是否存在该群聊id
 */
 func onRoomJoin(context *Context, room *user.Room, inviteeList []IContact, inviter IContact, date time.Time) {
+	// TODO 用不了
 }
 
 /*
@@ -123,9 +125,11 @@ func onRoomJoin(context *Context, room *user.Room, inviteeList []IContact, invit
 func onRoomleave(context *Context, room *user.Room, leaverList []IContact, remover IContact, date time.Time) {
 	log.Println("========================onRoomleave👇========================")
 	log.Printf("用户[%s]被踢出去聊", remover.Name())
+	// 用不了
 }
 
 func onFriendship(context *Context, friendship *user.Friendship) {
+	// 用不了
 	switch friendship.Type() {
 	case 1:
 	//FriendshipTypeUnknown
@@ -163,23 +167,26 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 func onHeartbeat(context *Context, data string) {
 	log.Println("========================onHeartbeat👇========================")
 	log.Printf("获取机器人的心跳: %s", data)
+	//	没啥用
 }
 
 func onError(context *Context, err error) {
 	ErrorFormat("机器人错误", err)
+	return
 }
 
 func onMessage(context *Context, message *user.Message) {
 	messages := encodeMessage(message)
-	if message.Self() {
+	if message.Self() { // Bot 自己发的消息
 		return
 	}
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 	}
 
-	if message.Type() == schemas.MessageTypeText {
-		if messages.Status {
+	if message.Type() == schemas.MessageTypeText { // 文本消息
+		if messages.Status { // 群聊状态
+			//if strings.Contains(message.Text(),"add") {} // 添加自定义的操作
 			if message.MentionSelf() {
 				log.Printf("%s@我 %s", messages.UserName, strings.Replace(strings.Replace(message.Text(), "@", "", 1), viper.GetString("bot.name"), "", 1))
 				DingMessage(fmt.Sprintf("%s @我 %s", messages.AutoInfo, strings.Replace(strings.Replace(message.Text(), "@", "", 1), viper.GetString("bot.name"), "", 1)))
@@ -190,13 +197,13 @@ func onMessage(context *Context, message *user.Message) {
 					《放鸽子》
 				`)
 			}
-			// TODO 设置TXT 拦截预处理
-			log.Printf("%s 说: %s", messages.AutoInfo, message.Text())
 		}
 		if strings.Contains("加群", message.Text()) {
 			// 邀请进群
 		}
 	}
+	// 打印所有的 TXT 类型的消息
+	log.Printf("%s 说: %s", messages.AutoInfo, message.Text())
 }
 
 func encodeMessage(message *user.Message) MessageInfo {
@@ -238,8 +245,8 @@ func main() {
 		log.Printf("Token:%s", viper.GetString("wechaty.wechaty_puppet_service_token"))
 		log.Printf("Endpoint: %s", viper.GetString("wechaty.wechaty_puppet_endpoint"))
 
-		bot.OnScan(onScan).
-			OnLogin(onlogin).
+		//bot.OnScan(onScan).
+		bot.OnLogin(onlogin).
 			OnLogout(onLogout).
 			OnMessage(onMessage).
 			OnRoomInvite(onRoomInvite).

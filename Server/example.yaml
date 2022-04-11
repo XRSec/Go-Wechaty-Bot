@@ -1,12 +1,10 @@
-addfriendkeywords: 加群
 bot:
   adminid: wxid # 通过发言查看日志 即可得到
-  name:
+  name: # 自动设置
 ding:
   keyword: Wechaty
-  token: e2e18da4d2deaed25edad74bc4c91c96f48a9aa3edf937bda6a76c6a1305177c
+  token: <token>
   url: https://oapi.dingtalk.com/robot/send?access_token=
-exepath: /var/folders/90/_g_10f095ln8cgf4qs_n5krw0000gn/T/go-build3507233953/b001/exe/main
 keyword:
   你好!: 你好!
   在: 当前主人不在,有事请留言!
@@ -14,7 +12,7 @@ keyword:
   在吗: 当前主人不在,有事请留言!
   在吗?: 当前主人不在,有事请留言!
 tuling:
-  token: <token>>&info=
+  token: <token>&info=
   url: http://www.tuling123.com/openapi/api?key=
 wechaty:
   wechaty_puppet_endpoint: 127.0.0.1:30000
