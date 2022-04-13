@@ -1,5 +1,7 @@
 # Go-Wechaty-Bot XP PROTOCOL
 
+[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://wechaty.js.org)
+
 > 仅供学习使用，*请勿用于非法用途*！
 
 ## Info
