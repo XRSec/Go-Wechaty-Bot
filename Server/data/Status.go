@@ -2,13 +2,14 @@ package data
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 	"log"
 	"os"
 	"path"
 	"runtime"
 	"time"
+
+	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 var (

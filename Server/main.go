@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	. "github.com/wechaty/go-wechaty/wechaty"
 	wp "github.com/wechaty/go-wechaty/wechaty-puppet"
@@ -85,8 +86,15 @@ func onRoomInvite(context *Context, roomInvitation *user.RoomInvitation) {
 	if err = roomInvitation.Accept(); err != nil {
 		ErrorFormat("Accept Room Invitation", err)
 		//	好像有点问题，群聊设置了邀请确认就用不了
+	} else {
+		if inviter, err := roomInvitation.Inviter(); err != nil {
+			ErrorFormat("加入群聊失败, Error: ", err)
+		} else {
+			SuccessFormat(fmt.Sprintf("通过群聊邀请, 群聊名称: %s 邀请人: %s", roomInvitation.String(), inviter.Name()))
+			//roomInvitation.GetWechaty().Message().Load(roomInvitation.String()).Say("hi")
+			// TODO 机器人进群自我介绍
+		}
 	}
-	log.Println(roomInvitation.String())
 }
 
 /*
@@ -102,6 +110,9 @@ func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic st
 	判断配置项群组id数组中是否存在该群聊id
 */
 func onRoomJoin(context *Context, room *user.Room, inviteeList []IContact, inviter IContact, date time.Time) {
+	log.Println("========================onRoomJoin👇========================")
+	log.Printf("群聊名称: %s, 新人: %s, 邀请人: %s, 时间: %s", room.String(), inviteeList, inviter.Name(), date)
+	//	TODO 新人进群自动欢迎
 }
 
 /*
@@ -116,33 +127,40 @@ func onRoomleave(context *Context, _ *user.Room, _ []IContact, remover IContact,
 func onFriendship(context *Context, friendship *user.Friendship) {
 	log.Println("========================onFriendship👇========================")
 	switch friendship.Type() {
-	case 1:
+	case 0:
 	//FriendshipTypeUnknown
-	case 2:
+	case 1:
 		//FriendshipTypeConfirm
 		/**
 		 * 2. 友谊确认
 		 */
 		log.Printf("friend ship confirmed with%s", friendship.Contact().Name())
-	case 3:
+	case 2:
 		//FriendshipTypeReceive
 		/*
 			1. 新的好友请求
 			设置请求后，我们可以从request.hello中获得验证消息,
 			并通过`request.accept（）`接受此请求
 		*/
-		if friendship.Hello() == viper.GetString("addFriendKeywords") {
-			if err = friendship.Accept(); err != nil {
-				ErrorFormat("添加好友失败", err)
-			}
+
+		if err = friendship.Accept(); err != nil {
+			ErrorFormat("添加好友失败", err)
 		} else {
-			log.Printf("%s未能自动通过好友申请, 因为验证消息是%s", friendship.Contact().Name(), friendship.Hello())
+			log.Printf("添加好友成功, 好友名称:%s", friendship.Contact().Name())
 		}
-	case 4:
+		// TODO 自动邀请好友进群
+		//if friendship.Hello() == viper.GetString("addFriendKeywords") {
+		//	err := friendship.GetWechaty().Room().Find("23244609561@chatroom").Add(friendship.Contact())
+		//	if err != nil {
+		//		return
+		//	}
+		//}
+
+	case 3:
 	//FriendshipTypeVerify
 	default:
 	}
-	log.Printf("%s好友关系是: %s", friendship.Contact().Name(), friendship.Type())
+	log.Printf("%s好友关系是: %s Hello: %s ", friendship.Contact().Name(), friendship.Type(), friendship.Hello())
 }
 
 /*
@@ -157,7 +175,7 @@ func onHeartbeat(context *Context, data string) {
 func OnMessage(context *Context, message *user.Message) {
 	messages := EncodeMessage(message)
 	if message.Self() {
-		//return
+		return
 	}
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
@@ -165,6 +183,7 @@ func OnMessage(context *Context, message *user.Message) {
 	if message.Type() == schemas.MessageTypeText {
 		if messages.Status { // 群聊
 			if messages.AtMe { // @我 的我操作
+				// @bot add @user TODO 需要裁减出指令名称
 				optionKeyWord := strings.Replace(messages.Content, " ", "", -1)
 				if viper.GetString(optionKeyWord) == "true" {
 					switch optionKeyWord {
@@ -209,7 +228,7 @@ func OnMessage(context *Context, message *user.Message) {
 		if strings.Contains("加群", message.Text()) {
 			// 邀请进群
 		}
-		//log.Println(messages.AutoInfo)
+		log.Println(messages.AutoInfo)
 		go ExportMessages(messages)
 	}
 	log.Println(message.Text(), message.From().Name())
