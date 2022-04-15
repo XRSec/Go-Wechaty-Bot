@@ -16,11 +16,11 @@ var (
 )
 
 func ErrorFormat(str string, err error) {
-	fmt.Println(logFormat("failed"), str, err)
+	log.Println(logFormat("failed"), str, "Error: ", err)
 }
 
 func SuccessFormat(str string) {
-	fmt.Println(logFormat("success"), str)
+	log.Println(logFormat("success"), str)
 }
 
 func ViperWrite() {

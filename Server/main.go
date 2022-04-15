@@ -18,10 +18,7 @@ import (
 )
 
 var (
-	err        error
-	context    *Context
-	friendship *user.Friendship
-	room       *user.Room
+	err error
 )
 
 func init() {
@@ -152,12 +149,12 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 	@method onHeartbeat 获取机器人的心跳。
 	@param {*} user
 */
-func onHeartbeat(_ *Context, data string) {
+func onHeartbeat(context *Context, data string) {
 	log.Println("========================onHeartbeat👇========================")
 	log.Printf("获取机器人的心跳: %s", data)
 }
 
-func OnMessage(_ *Context, message *user.Message) {
+func OnMessage(context *Context, message *user.Message) {
 	messages := EncodeMessage(message)
 	if message.Self() {
 		return
@@ -168,41 +165,56 @@ func OnMessage(_ *Context, message *user.Message) {
 	if message.Type() == schemas.MessageTypeText {
 		if messages.Status { // 群聊
 			if messages.AtMe { // @我 的我操作
-				if strings.Contains(messages.Content, "add") { // add 指令 （加好友）
-					if messages.UserID == viper.GetString("bot.adminid") {
-						//AddFriend(strings.Replace(strings.Replace(messages.Content, "add", "", 1), "@", "", 1), friendship)
+				optionKeyWord := strings.Replace(messages.Content, " ", "", -1)
+				if viper.GetString(optionKeyWord) == "true" {
+					switch optionKeyWord {
+					case "add":
+						//	// add 指令 （加好友）
+						AddFriend(messages, message)
+					case "踢":
+						// 踢人
+						DeleteUser(messages, message)
+					case "djs":
+						// 倒计时
+					case "加群":
+						InviteUser(messages, message)
+						// 邀请进群
+					default:
+
 					}
-				}
-				// 优先微信开放平台API
-				messages = WXAPI(messages)
-				if messages.Reply != "" {
-					SayMsg(message, messages.Reply)
 				} else {
-					// 图灵API
-					messages = TulingMessage(messages)
+					// 优先微信开放平台API
+					messages = WXAPI(messages)
 					if messages.Reply != "" {
 						SayMsg(message, messages.Reply)
+					} else {
+						// 图灵API
+						messages = TulingMessage(messages)
+						if messages.Reply != "" {
+							SayMsg(message, messages.Reply)
+						}
 					}
+					DingMessage(messages.AutoInfo)
 				}
-				DingMessage(messages.AutoInfo)
-			}
-			if strings.Contains(message.Text(), "基于你的优异表现，+") {
-				SayMsg(message, `
-					我也要! [旺柴] 给你表演个才艺吧!
-					《放鸽子》
-				`)
+			} // 没有 @我 就老老实实的
+		} else { // 私聊
+			for i := range viper.GetStringMap("keyword") { // 遍历 keyword
+				if viper.GetString("keyword."+i) == "true" { // 判断功能是否开启
+					//if
+				}
 			}
 			// TODO 设置TXT 拦截预处理
-			log.Println(messages.AutoInfo)
+			//log.Println(messages.AutoInfo)
 		}
 		if strings.Contains("加群", message.Text()) {
 			// 邀请进群
 		}
+		log.Printf("用户: [%s] 聊天内容:[%s]", message.From().Name(), message.Text())
 		go ExportMessages(messages)
 	}
 }
 
-func onError(_ *Context, err error) {
+func onError(context *Context, err error) {
 	ErrorFormat("机器人错误", err)
 }
 

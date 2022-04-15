@@ -40,7 +40,8 @@
 4. Install the Software ([**WeChat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
    ```bash
    > node-v16.exe WeChatSetup-v3.3.0.115.exe
-   > @cnpm install -g wechaty@1.11 wechaty-puppet-xp
+   > @cnpm install -g windows-build-tools
+   > @cnpm install -g wechaty wechaty-puppet-xp
    ```
 5. Optional operation
    ```bash

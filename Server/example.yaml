@@ -1,7 +1,7 @@
 addfriendkeywords: 加群
 bot:
   adminid: wxid # 通过发言查看日志 即可得到
-  name:
+  name: bot name
 ding:
   keyword: Wechaty
   token: e2e18da4d2deaed25edad74bc4c91c96f48a9aa3edf937bda6a76c6a1305177c
@@ -14,8 +14,11 @@ keyword:
   在吗: 当前主人不在,有事请留言!
   在吗?: 当前主人不在,有事请留言!
 tuling:
-  token: <token>>&info=
+  token: <token>&info=
   url: http://www.tuling123.com/openapi/api?key=
 wechaty:
   wechaty_puppet_endpoint: 127.0.0.1:30000
   wechaty_puppet_service_token: insecure_<token>
+wxopenai:
+  env: online
+  token: <token>
