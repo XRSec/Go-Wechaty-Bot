@@ -9,7 +9,7 @@
 [6]: https://github.com/XRSec/gobot/tree/padlocal
 [7]: https://github.com/XRSec/gobot/tree/4u
 
-[![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 〰️ [ Click on the switch ]
+[![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 「 Select Gateway 」
 
 ## General
 
@@ -18,7 +18,7 @@
    git clone https://github.com/XRSec/gobot.git wechatbot
    cd wechatbot\Gateway
    ```
-   
+
 2. Install the Packages
       ```bash
       # node-v16
