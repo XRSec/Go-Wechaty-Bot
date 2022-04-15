@@ -4,3 +4,4 @@ config.yaml
 tmp
 main.exe
 data.json
+test.sh
