@@ -11,6 +11,12 @@
 
 [![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 〰️ [ Click on the switch ]
 
+## General
+
+### init
+
+
+
 ## ⚓️ Re
 
 1. [wechat-bot](https://github.com/cixingguangming55555/wechat-bot/blob/master/pic/doc.md)
