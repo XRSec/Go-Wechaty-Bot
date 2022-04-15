@@ -41,13 +41,12 @@ flowchart LR
 1. Checkout branch
 
    ```bash
-   git checkout padlocal
+   cd padlocal
    ```
 
 2. Get & Generate Token
 
    ```bash
-   # Generate Token
    WECHATY_PUPPET_PADLOCAL_TOKEN: http://pad-local.com/#/tokens
    WECHATY_TOKEN：curl -s https://www.uuidgenerator.net/api/version4
    WECHATY_PUPPET_SERVICE_TOKEN："insecure_" + WECHATY_TOKEN
@@ -64,17 +63,17 @@ flowchart LR
    export WECHATY_PUPPET_SERVER_PORT="25000"
    ```
 
-4. Install the Packages
+<!-- 4. Install the Packages
 
    ```bash
    # node-v16
-   npm install -g wechaty-puppet-xp
-   # npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-xp
-   ```
+   npm install -g wechaty-puppet-padlocal
+   # npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-padlocal
+   ``` -->
 
 ### Start Server
 
 ```bash
-cd Gateway && bash wechatyGateway.sh # Start Gateway
-make server # Start Server
+cd padlocal && bash ./wechatyGateway.sh # Start puppet-xp Gateway
+cd server && go run main.go # Start Server
 ```

@@ -1,4 +1,4 @@
-# Go-Wechaty-Bot XP PROTOCOL
+## Go-Wechaty-Bot XP PROTOCOL
 
 > 仅供学习使用，*请勿用于非法用途*！
 
@@ -15,6 +15,8 @@
 
 > Gateway : puppet-xp
 > Server: go-wechaty
+
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -33,8 +35,9 @@ flowchart LR
 ### Init (depend main.General)
 
 1. Checkout branch
+
    ```bash
-   git checkout xp
+   cd xp
    ```
 
 2. Generate Token
@@ -47,18 +50,24 @@ flowchart LR
    ```
 
 3. Modifying a Configuration File
+
    ```bash
    # wechatyGateway.bat
    @set WECHATY_TOKEN=xxxxxxxxxxxxxxxxxx
    @set WECHATY_PUPPET_SERVICE_TOKEN=insecure_xxxxxxxxxxxxxxxxxx
    @set WECHATY_PUPPET_SERVER_PORT=25000
    ```
+
 4. Install the Software ([**WeChat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
+
    ```bash
    # WeChatSetup-v3.3.0.115.exe
+   npm --registry https://registry.npm.taobao.org install -g windows-build-tools
    npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-xp
    ```
+
 5. Optional operation
+
    ```bash
    # Set Environment
    @chdir
@@ -68,6 +77,6 @@ flowchart LR
 ### Start Server
 
 ```bash
-cd Gateway .\wechaty.bat # Start puppet-xp Gateway
-make server # Start Server
+cd xp && .\wechatyGateway.bat # Start puppet-xp Gateway
+cd server && go run main.go # Start Server
 ```

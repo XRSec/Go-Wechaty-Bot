@@ -1,4 +1,4 @@
-# Go-Wechaty-Bot
+## Go-Wechaty-Bot
 
 > 仅供学习使用，*请勿用于非法用途*！
 
@@ -11,22 +11,42 @@
 
 [![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 「 Select Gateway 」
 
+## Architecture
+
+```mermaid
+flowchart LR
+    Polyglot-->Python
+    Polyglot-->Go
+    Polyglot -->Rust
+    Python-->Grpc
+    Go-->Grpc
+    Rust-->Grpc
+    Grpc-->Gateway{Gateway}-->Puppet{Puppet}
+    Grpc-->Docker{Docker}-->Puppet{Puppet}
+  Puppet{Puppet}-->xp-->微信
+  Puppet{Puppet}-->padlcoal-->微信
+    Puppet{Puppet}-->wechat4u-->微信
+```
+
 ## General
 
 1. Clone Repo
+
    ```bash
    git clone https://github.com/XRSec/gobot.git wechatbot
-   cd wechatbot\Gateway
+   cd wechatbot
    ```
 
 2. Install the Packages
-      ```bash
-      # node-v16
-      npm --registry https://registry.npm.taobao.org install -g windows-build-tools
-      npm --registry https://registry.npm.taobao.org install -g wechaty
-      ```
-3. Edit `Server/config.yaml`
-      ```yaml
+
+   ```bash
+   # node-v16
+   npm --registry https://registry.npm.taobao.org install -g wechaty
+   ```
+
+3. Edit `Server/config.yaml`.
+
+   ```yaml
    bot:
      adminid: wxid_xxxxx
      name: xxxxxxxx
@@ -44,45 +64,31 @@
      env: online
      token: xxxxxxxxxxxxxxxxxxxxx
    ```
+
 4. Checking the Network Environment
-   ```go
-   if Gateway near Server {
-   	IP = NAT_IP
-   } else {
-   	IP = InterNet_IP
-   }
-   if PORT on {
-   	continue
-   } else {
-   	os.exit(0)
-   }
-   ```
 
-
-## Architecture
-
-```mermaid
-flowchart LR
-    Polyglot-->Python
-    Polyglot-->Go
-    Polyglot -->Rust
-    Python-->Grpc
-    Go-->Grpc
-    Rust-->Grpc
-    Grpc-->Gateway{Gateway}-->Puppet{Puppet}
-    Grpc-->Docker{Docker}-->Puppet{Puppet}
-		Puppet{Puppet}-->xp-->微信
-		Puppet{Puppet}-->padlcoal-->微信
-    Puppet{Puppet}-->wechat4u-->微信
-```
+  ```go
+  if Gateway near Server {
+  IP = NAT_IP
+  } else {
+  IP = InterNet_IP
+  }
+  if PORT on {
+  continue
+  } else {
+  os.exit(0)
+  }
+  ```
 
 ## ⚓️ Re
 
 1. [wechat-bot](https://github.com/cixingguangming55555/wechat-bot/blob/master/pic/doc.md)
+
 2. [puppet-services](https://wechaty.js.org/docs/puppet-services/diy/#all-in-one-command)
+
 3. [issues](https://github.com/wechaty/puppet-xp/issues/38)
 
-## ⚠️ Notice
+## ⚠️ Debug
 
 1. Network
 
@@ -97,11 +103,11 @@ flowchart LR
 
 ## Update Repo
 
-1. TODO || example.yaml
-2. Update.log
+1. TODO && example.yaml
+2. Update.md && Log.md
 
 ## Contact me
 
 Reply to group chat with us
 
-![](Image/bot.png)
+![wxid: XRSec_MSG](Image/bot.png)

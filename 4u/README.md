@@ -43,7 +43,7 @@ flowchart LR
 1. Checkout branch
 
    ```bash
-   git checkout 4u
+   cd 4u
    ```
 
 2. Generate Token
@@ -56,29 +56,25 @@ flowchart LR
    ```
 
 3. Modifying a Configuration File
+
    ```bash
    # wechatyGateway.bat
    @set WECHATY_TOKEN=5f3029c0-0f46-4436-bdc6-02efcbad3309
    @set WECHATY_PUPPET_SERVICE_TOKEN=insecure_34bf8353-0874-4b29-851d-e8a2502fc747
    @set WECHATY_PUPPET_SERVER_PORT=25000
    ```
-4. Install the Software ([**WeChat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
-   ```bash
-   > node-v16.exe WeChatSetup-v3.3.0.115.exe
-   > @cnpm install -g windows-build-tools
-   > @cnpm install -g wechaty wechaty-puppet-xp
-   ```
-5. Optional operation
-   ```bash
-   # Set Environment
-   @chdir
-   # Google: How to set the path and environment variables in Windows
-   ```
 
+<!-- 4. Install the Packages
+
+   ```bash
+   # node-v16
+   npm install -g wechaty wechaty-puppet-xp
+   # npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-xp
+   ``` -->
 
 ### Start Server
 
 ```bash
-.\wechaty.bat # Start puppet-xp Gateway
-make server # Start Server
+cd 4u && bash ./wechatyGateway.sh # Start puppet-wechat4u Gateway
+cd server && go run main.go # Start Server
 ```
