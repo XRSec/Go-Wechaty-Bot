@@ -15,7 +15,27 @@
 
 ### init
 
+```bash
+```
 
+
+
+### Architecture
+
+```mermaid
+flowchart LR
+    Polyglot-->Python
+    Polyglot-->Go
+    Polyglot -->Rust
+    Python-->Grpc
+    Go-->Grpc
+    Rust-->Grpc
+    Grpc-->Gateway{Gateway}-->Puppet{Puppet}
+    Grpc-->Docker{Docker}-->Puppet{Puppet}
+		Puppet{Puppet}-->xp-->微信
+		Puppet{Puppet}-->padlcoal-->微信
+    Puppet{Puppet}-->wechat4u-->微信
+```
 
 ## ⚓️ Re
 
