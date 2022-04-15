@@ -1,4 +1,5 @@
 # Go-Wechaty-Bot XP PROTOCOL
+[![puppet-xp](https://img.shields.io/badge/puppet-xp-blue)](/tree/4u)
 
 > 仅供学习使用，*请勿用于非法用途*！
 
