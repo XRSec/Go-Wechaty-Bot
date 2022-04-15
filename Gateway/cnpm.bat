@@ -1,1 +1,0 @@
-@npm --registry https://registry.npm.taobao.org %*
