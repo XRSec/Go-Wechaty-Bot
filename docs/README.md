@@ -13,14 +13,53 @@
 
 ## General
 
-### init
+1. Clone Repo
+   ```bash
+   git clone https://github.com/XRSec/gobot.git wechatbot
+   cd wechatbot\Gateway
+   ```
+   
+2. Install the Packages
+      ```bash
+      # node-v16
+      npm --registry https://registry.npm.taobao.org install -g windows-build-tools
+      npm --registry https://registry.npm.taobao.org install -g wechaty
+      ```
+3. Edit `Server/config.yaml`
+      ```yaml
+   bot:
+     adminid: wxid_xxxxx
+     name: xxxxxxxx
+   ding:
+     keyword: Wechaty
+     token: xxxxxxxxxxxxxxxxxx
+     url: https://oapi.dingtalk.com/robot/send?access_token=
+   tuling:
+     token: xxxxxxxxxxxxxxxx&info=
+     url: http://www.tuling123.com/openapi/api?key=
+   wechaty:
+     wechaty_puppet_endpoint: 127.0.0.1:25001
+     wechaty_puppet_service_token: insecure_xxxxxxxxxxxxxxxxxxxxxx
+   wxopenai:
+     env: online
+     token: xxxxxxxxxxxxxxxxxxxxx
+   ```
+4. Checking the Network Environment
+   ```go
+   if Gateway near Server {
+   	IP = NAT_IP
+   } else {
+   	IP = InterNet_IP
+   }
+   if PORT on {
+   	continue
+   } else {
+   	os.exit(0)
+   }
+   ```
 
-```bash
-```
 
-
-
-### Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
