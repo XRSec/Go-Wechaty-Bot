@@ -1,4 +1,4 @@
-name: AWVS14 Docker Build
+name: updated docs
 
 on:
   push:
