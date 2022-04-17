@@ -1,0 +1,46 @@
+# wget
+
+name: Update Docs
+
+on:
+  repository_dispatch:
+    types: [The beta version is updated]
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: updateDocs
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Private Actions Checkout
+        uses: actions/checkout@v2
+      -
+        name: Get Docs
+        id: getdocs
+        run: |
+          set -ex
+          curl -u "XRSec:${{ secrets.TOKEN_GITHUB }}" -sL "https://api.github.com/repos/XRSec/${{ secrets.BETAREPO }}/zipball" -o tmp.zip" || exit
+          unzip tmp.zip || exit
+          rm tmp.zip || exit
+          rm -rf Docs || exit
+          mv XRSec*/Docs . || exit
+          rm -rf XRSec* || exit
+          echo "::set-output name=status::true"
+      -
+        name: Update Docs
+        if: steps.getdocs.outputs.status == 'true'
+        id: updatedocs
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add . || exit
+          git commit -m "The beta version is updated" -a || exit
+          echo "::set-output name=status::true"
+      -
+        name: Push changes
+        if: steps.updatedocs.outputs.status == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN_GITHUB }}
+          branch: ${{ github.ref }}
