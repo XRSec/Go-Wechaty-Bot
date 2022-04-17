@@ -13,8 +13,12 @@
 
 ## Info
 
-> Gateway : puppet-xp
-> Server: go-wechaty
+### Glossary
+
+```ini
+Gateway : puppet-xp
+Server: go-wechaty
+```
 
 ## Architecture
 
