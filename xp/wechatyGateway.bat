@@ -1,10 +1,10 @@
 @chcp 65001
 @cls
 @set WECHATY_PUPPET=wechaty-puppet-xp
-@set WECHATY_TOKEN=5f3029c0-0f46-4436-bdc6-02efcbad3309
+@set WECHATY_TOKEN=xxxxxxxxxx
 @REM export WECHATY_TOKEN=$(curl -s https://www.uuidgenerator.net/api/version4)
 
-@set WECHATY_PUPPET_SERVICE_TOKEN=insecure_34bf8353-0874-4b29-851d-e8a2502fc747
+@set WECHATY_PUPPET_SERVICE_TOKEN=insecure_xxxxxxxxxx
 @REM set WECHATY_PUPPET_SERVICE_TOKEN="insecure_$(curl -s https://www.uuidgenerator.net/api/version4)"
 
 @set WECHATY_PUPPET_SERVER_PORT=25000

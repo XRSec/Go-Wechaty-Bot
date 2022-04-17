@@ -5,16 +5,20 @@
 [1]: https://img.shields.io/badge/puppet-xp-blue
 [2]: https://img.shields.io/badge/puppet-padlocal-blue
 [3]: https://img.shields.io/badge/puppet-4u-blue
-[5]: https://github.com/XRSec/gobot/tree/xp
-[6]: https://github.com/XRSec/gobot/tree/padlocal
-[7]: https://github.com/XRSec/gobot/tree/4u
+[5]: /xp#go-wechaty-bot-xp-protocol
+[6]: /padlocal#go-wechaty-bot-padlcoal-protocol
+[7]: /4u#go-wechaty-bot-4u-protocol
 
 [![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 「 Select Gateway 」
 
 ## Info
 
-> Gateway : puppet-xp
-> Server: go-wechaty
+### Glossary
+
+```ini
+Gateway : puppet-xp
+Server: go-wechaty
+```
 
 ## Architecture
 
