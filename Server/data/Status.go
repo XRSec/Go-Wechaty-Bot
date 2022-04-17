@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 var (
@@ -61,11 +60,5 @@ func ViperRead() {
 				}
 			}(f)
 		}
-	}
-}
-
-func SayMsg(message *user.Message, msg string) {
-	if _, err := message.Say("@" + message.From().Name() + msg); err != nil {
-		ErrorFormat("SayMsg", err)
 	}
 }

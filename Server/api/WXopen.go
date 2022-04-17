@@ -29,14 +29,14 @@ type (
 	}
 )
 
-func WXAPI(msg MessageInfo) MessageInfo {
+func WXAPI(messages MessageInfo) MessageInfo {
 	/*
 		WXopenai.TOKEN
 		WXopenai.ENV
 	*/
 	if NightMode() {
 		log.Println("现在处于夜间模式，请在白天使用")
-		return msg
+		return messages
 	} else {
 		var (
 			res       *http.Response
@@ -45,7 +45,7 @@ func WXAPI(msg MessageInfo) MessageInfo {
 			wxSession = WxSession{}
 			answer    = Answer{}
 		)
-		if res, err = http.Post("https://openai.weixin.qq.com/openapi/sign/"+viper.GetString("WXopenai.TOKEN"), "application/json", strings.NewReader(fmt.Sprintf(`{"username":"%s","userid": "%s"}`, msg.UserName, msg.UserID))); err != nil {
+		if res, err = http.Post("https://openai.weixin.qq.com/openapi/sign/"+viper.GetString("WXopenai.TOKEN"), "application/json", strings.NewReader(fmt.Sprintf(`{"username":"%s","userid": "%s"}`, messages.UserName, messages.UserID))); err != nil {
 			log.Println("请求 signature 接口失败! 错误:", err)
 		} else {
 			if body, err = ioutil.ReadAll(res.Body); err != nil {
@@ -55,7 +55,7 @@ func WXAPI(msg MessageInfo) MessageInfo {
 					log.Printf("解析 signature 信息失败! Error: %+v", wxSession.Errmsg)
 				} else {
 					log.Printf("解析 signature 信息成功!")
-					if res, err = http.Post("https://openai.weixin.qq.com/openapi/aibot/"+viper.GetString("WXopenai.TOKEN"), "application/json", strings.NewReader(fmt.Sprintf(`{"signature": "%s", "query": "%s","env": "%s"}`, wxSession.Signature, msg.Content, viper.GetString("WXopenai.ENV")))); err != nil {
+					if res, err = http.Post("https://openai.weixin.qq.com/openapi/aibot/"+viper.GetString("WXopenai.TOKEN"), "application/json", strings.NewReader(fmt.Sprintf(`{"signature": "%s", "query": "%s","env": "%s"}`, wxSession.Signature, messages.Content, viper.GetString("WXopenai.ENV")))); err != nil {
 						log.Println("请求 aibot 接口失败! 错误:", err)
 					} else {
 						if body, err = ioutil.ReadAll(res.Body); err != nil {
@@ -66,10 +66,12 @@ func WXAPI(msg MessageInfo) MessageInfo {
 							} else {
 								log.Printf("解析 aibot 信息成功!")
 								if answer.Answer != "" {
-									msg.Reply = answer.Answer
-									log.Printf("wx 机器人 回复信息: %+v", msg.Reply)
-									msg.AutoInfo += " 回复: [" + msg.Reply + "]"
-									//log.Printf("WXopenai.TOKEN:[%s] msg.UserName:[%s], msg.UserID:[%s] wxSession.Signature:[%s] msg.Content:[%v] WXopenai.ENV:[%s] answer:[%v]", viper.GetString("WXopenai.TOKEN"), msg.UserName, msg.UserID, wxSession.Signature, msg.Content, viper.GetString("WXopenai.ENV"), answer)
+									messages.Reply = answer.Answer
+									log.Printf("wx 机器人 回复信息: %+v", messages.Reply)
+									messages.AutoInfo += " 回复: [" + messages.Reply + "]"
+									//log.Printf("WXopenai.TOKEN:[%s] messages.UserName:[%s], messages.UserID:[%s] wxSession.Signature:[%s] messages.Content:[%v] WXopenai.ENV:[%s] answer:[%v]", viper.GetString("WXopenai.TOKEN"), messages.UserName, messages.UserID, wxSession.Signature, messages.Content, viper.GetString("WXopenai.ENV"), answer)
+								} else {
+									log.Println("wx 机器人 回复信息为空")
 								}
 							}
 						}
@@ -89,6 +91,6 @@ func WXAPI(msg MessageInfo) MessageInfo {
 				fmt.Println(err)
 			}
 		}(res.Body)
-		return msg
+		return messages
 	}
 }

@@ -2,25 +2,27 @@ package data
 
 import (
 	"encoding/json"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
+	"fmt"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 type (
 	MessageInfo struct {
-		Data     string
-		Status   bool // 群聊属性
-		AtMe     bool // 是否@我
-		RoomName string
-		RoomID   string
-		UserName string
-		UserID   string
-		Content  string
-		AutoInfo string
-		Reply    string
+		Data     string `json:"data"`     // 日期
+		Status   bool   `json:"status`    // 群聊属性
+		AtMe     bool   `json:"atme"`     // 是否@我
+		RoomName string `json:"roomname"` // 群聊名称
+		RoomID   string `json:"roomid"`   // 群聊ID
+		UserName string `json:"username"` // 用户名称
+		UserID   string `json:"userid"`   // 用户ID
+		Content  string `json:"content"`  // 聊天内容
+		AutoInfo string `json:"autoinfo"` // 信息一览
+		Reply    string `json:"reply"`    // 自动回复
 	}
 )
 
@@ -33,30 +35,38 @@ func EncodeMessage(message *user.Message) MessageInfo {
 		AtMe:     false,
 		UserName: UserName,
 		UserID:   UserID,
-		Content:  message.Text(),
-		AutoInfo: "用户ID: [" + UserID + "] 用户名称: [" + UserName + "] 说: [" + message.Text() + "]",
+		Content:  message.MentionText(),
+		//AutoInfo: "用户ID: [" + UserID + "] 用户名称: [" + UserName + "] 说: [" +  + "]",
+		AutoInfo: fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v]", UserID, UserName, strings.Replace(message.Text(), "\u2005", " ", -1)),
+		//	 TODO Autoinfo 内容
 	}
 	if message.Room() != nil {
 		messages.Status = true
 		messages.RoomID = message.Room().ID()
 		messages.RoomName = strings.Replace(strings.Replace(message.Room().String(), "Room<", "", 1), ">", "", 1)
-		messages.AutoInfo = "群聊ID: [" + messages.RoomID + "] 群聊名称: [" + messages.RoomName + "] " + messages.AutoInfo
-		if message.MentionSelf() || strings.Contains(message.Text(), "@"+viper.GetString("bot.name")) {
+		//messages.AutoInfo = "群聊ID: [" + messages.RoomID + "] 群聊名称: [" + messages.RoomName + "] " + messages.AutoInfo
+		messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %s", messages.RoomID, messages.RoomName, messages.AutoInfo)
+		if message.MentionSelf() {
+			//if message.MentionSelf() || strings.Contains(message.Text(), "@"+viper.GetString("bot.name")) {
 			messages.AtMe = true
-			messages.Content = strings.Replace(message.Text(), "@"+viper.GetString("bot.name"), "", 1)
+			//messages.Content = strings.Replace(strings.Replace(message.Text(), "\u2005", "", -1), "@"+viper.GetString("bot.name"), "", 1) // 去皮操作
 		}
 	}
 	return messages
 }
 
-func ExportMessages(context MessageInfo) {
+/*
+	Json 日志格式化
+	ExportMessages(messages MessageInfo)
+*/
+func ExportMessages(messages MessageInfo) {
 	var (
 		fp       *os.File
 		filename = viper.GetString("rootPath") + "/data.json"
 	)
-	context.Data = time.Now().Format("2006_01_02_15_04_05.00000")
+	messages.Data = time.Now().Format("2006-01-02T15:04:05.00000")
 	var result []byte
-	if result, err = json.Marshal(context); err != nil {
+	if result, err = json.Marshal(messages); err != nil {
 		ErrorFormat("Json 解析失败!", err)
 	}
 	if _, err = os.Stat(filename); err != nil {

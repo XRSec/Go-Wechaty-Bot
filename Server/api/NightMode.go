@@ -1,10 +1,11 @@
 package api
 
 import (
+	"github.com/spf13/viper"
 	"time"
 )
 
-func NightMode() bool {
+func NightMode(userID string) bool {
 	//当前时间
 	startTimeStr := "00:00:00"
 	endTimeStr := "06:00:00"
@@ -18,5 +19,9 @@ func NightMode() bool {
 	//将结束时间拼接“年-月-日 ”转换为time类型
 	timeEnd, _ := time.ParseInLocation(layout, format+" "+endTimeStr, time.Local)
 	//使用time的Before和After方法，判断当前时间是否在参数的时间范围
-	return now.Before(timeEnd) && now.After(timeStart)
+	if userID == viper.GetString("bot.adminid") {
+		return true
+	} else {
+		return now.Before(timeEnd) && now.After(timeStart)
+	}
 }

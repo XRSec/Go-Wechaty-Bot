@@ -9,8 +9,10 @@ tuling:
   token: xxxxxxxxxxxxxxxx&info=
   url: http://www.tuling123.com/openapi/api?key=
 wechaty:
-  wechaty_puppet_endpoint: 127.0.0.1:25001
-  wechaty_puppet_service_token: insecure_xxxxxxxxxxxxxxxxxxxxxx
+  endpoint: 127.0.0.1:25001
+  token: insecure_xxxxxxxxxxxxxxxxxxxxxx
 wxopenai:
   env: online
   token: xxxxxxxxxxxxxxxxxxxxx
+group:
+  xxxxx: xxxxx@chatroom
