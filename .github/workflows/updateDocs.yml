@@ -22,7 +22,7 @@ jobs:
           unzip tmp.zip || exit
           rm tmp.zip || exit
           rm -rf Docs || exit
-          mv XRSec*/Docs . || exit
+          mv XRSec*/docs . || exit
           rm -rf XRSec* || exit
           echo "::set-output name=status::true"
       -
