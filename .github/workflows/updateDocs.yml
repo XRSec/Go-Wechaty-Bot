@@ -8,8 +8,6 @@ on:
       - '4u/**'
       - 'padlocal/**'
       - 'xp/**'
-    paths-ignore:
-      - 'Server/**'
 
 jobs:
   Repository_Dispatch:
