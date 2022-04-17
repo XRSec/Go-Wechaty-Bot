@@ -1,0 +1,25 @@
+name: AWVS14 Docker Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:   # 这里是用来指定哪个文件更改，才会触发的
+      - 'docs/**'
+      - '4u/**'
+      - 'padlocal/**'
+      - 'xp/**'
+    paths-ignore:
+      - 'Server/**'
+
+jobs:
+  Repository_Dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          repository: ${{ github.repository_owner }}/Go-Wechaty-Bot
+          event-type: The beta version is updated
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
