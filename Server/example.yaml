@@ -1,19 +1,18 @@
 bot:
-  adminid: wxid # 通过发言查看日志 即可得到
-  name: # 自动设置
+  adminid: wxid_xxxxx
+  name: xxxxxxxx
 ding:
   keyword: Wechaty
-  token: <token>
+  token: xxxxxxxxxxxxxxxxxx
   url: https://oapi.dingtalk.com/robot/send?access_token=
-keyword:
-  你好!: 你好!
-  在: 当前主人不在,有事请留言!
-  在?: 当前主人不在,有事请留言!
-  在吗: 当前主人不在,有事请留言!
-  在吗?: 当前主人不在,有事请留言!
 tuling:
-  token: <token>&info=
+  token: xxxxxxxxxxxxxxxx&info=
   url: http://www.tuling123.com/openapi/api?key=
 wechaty:
-  wechaty_puppet_endpoint: 127.0.0.1:30000
-  wechaty_puppet_service_token: insecure_<token>
+  endpoint: 127.0.0.1:25001
+  token: insecure_xxxxxxxxxxxxxxxxxxxxxx
+wxopenai:
+  env: online
+  token: xxxxxxxxxxxxxxxxxxxxx
+group:
+  xxxxx: xxxxx@chatroom
