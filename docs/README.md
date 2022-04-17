@@ -5,9 +5,9 @@
 [1]: https://img.shields.io/badge/puppet-xp-blue
 [2]: https://img.shields.io/badge/puppet-padlocal-blue
 [3]: https://img.shields.io/badge/puppet-4u-blue
-[5]: https://github.com/XRSec/gobot/tree/xp
-[6]: https://github.com/XRSec/gobot/tree/padlocal
-[7]: https://github.com/XRSec/gobot/tree/4u
+[5]: /xp
+[6]: /padlocal
+[7]: /4u
 
 [![puppet-xp][1]][5] 〰️ [![puppet-padlocal][2]][6] 〰️ [![puppet-4u][3]][7] 「 Select Gateway 」
 
