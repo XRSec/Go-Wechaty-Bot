@@ -34,7 +34,7 @@ func WXAPI(messages MessageInfo) MessageInfo {
 		WXopenai.TOKEN
 		WXopenai.ENV
 	*/
-	if NightMode() {
+	if NightMode(messages.UserID) {
 		log.Println("现在处于夜间模式，请在白天使用")
 		return messages
 	} else {
