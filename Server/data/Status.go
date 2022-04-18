@@ -2,13 +2,13 @@ package data
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 	"log"
 	"os"
 	"path"
 	"runtime"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 var (
@@ -16,11 +16,17 @@ var (
 )
 
 func ErrorFormat(str string, err error) {
-	fmt.Println(logFormat("failed"), str, err)
+	_, file, line, _ := runtime.Caller(1)
+	prefix := "[xrsec]"
+	date := time.Now().Format("15:04:05")
+	fmt.Printf("%s %s%s %s:%d %s%s\n", prefix, viper.GetString("failed"), date, path.Base(file), line, str, err)
 }
 
 func SuccessFormat(str string) {
-	fmt.Println(logFormat("success"), str)
+	_, file, line, _ := runtime.Caller(1)
+	prefix := "[xrsec]"
+	date := time.Now().Format("15:04:05")
+	fmt.Printf("%s %s%s %s:%d %s\n", prefix, viper.GetString("success"), date, path.Base(file), line, str)
 }
 
 func ViperWrite() {
@@ -54,19 +60,5 @@ func ViperRead() {
 				}
 			}(f)
 		}
-	}
-}
-
-func logFormat(status string) string {
-	pc, file, line, _ := runtime.Caller(3)
-	prefix := "[xrsec]"
-	date := time.Now().Format("15:04:05.00000")
-	file = path.Ext(runtime.FuncForPC(pc).Name())[2:] + path.Base(file)
-	return fmt.Sprintf("%s %s%s %s:%d", prefix, viper.GetString(status), date, file, line)
-}
-
-func SayMsg(message *user.Message, msg string) {
-	if _, err := message.Say("@" + message.From().Name() + msg); err != nil {
-		ErrorFormat("SayMsg", err)
 	}
 }
