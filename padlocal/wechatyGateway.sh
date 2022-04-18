@@ -18,7 +18,7 @@ export WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER="true"
 echo "WECHATY_PUPPET_PADLOCAL_TOKEN = ${WECHATY_PUPPET_PADLOCAL_TOKEN}"
 
 if [ ! -n "$1" ]; then
-    export tag=latest
+    export tag="0.68"
 else
     export tag=$1
 fi
