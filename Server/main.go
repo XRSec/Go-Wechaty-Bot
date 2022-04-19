@@ -422,6 +422,9 @@ func main() {
 		// 钉钉推送
 		ViperRead()
 		DingBotCheck()
+		if err = os.Setenv("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT")); err != nil {
+			ErrorFormat("你丫的不设置禁用TLS出问题了别说我没提醒, Error:", err)
+		}
 		var bot = NewWechaty(WithPuppetOption(wp.Option{
 			Token:    viper.GetString("wechaty.token"),
 			Endpoint: viper.GetString("wechaty.endpoint"),

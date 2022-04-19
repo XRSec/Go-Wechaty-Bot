@@ -8,7 +8,8 @@
 @REM set WECHATY_PUPPET_SERVICE_TOKEN="insecure_$(curl -s https://www.uuidgenerator.net/api/version4)"
 
 @set WECHATY_PUPPET_SERVER_PORT=25000
-@set WECHATY_LOG="verbose"
+@rem silent | error | warn | info | verbose | silly
+@set WECHATY_LOG="verbose" 
 @set WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER=true
 
 @echo WECHATY_TOKEN = %WECHATY_TOKEN%
