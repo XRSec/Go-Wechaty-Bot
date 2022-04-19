@@ -206,29 +206,57 @@ func onHeartbeat(context *Context, data string) {
 /*
 	messages MessageInfo, message *user.Message
 */
-func SayMessage(messages MessageInfo, message *user.Message) {
+func SayMessage(messages MessageInfo, message *user.Message) MessageInfo {
 	if len(messages.Content) > 60 {
 		ErrorFormat("消息过长! 消息详情: ", errors.New(messages.AutoInfo))
-		return
+		messages.Reply = "消息过长! "
+		return messages
 	}
 	if strings.Contains(messages.Content, "\n") {
 		ErrorFormat("消息含有特殊字符! 消息详情: ", errors.New(messages.AutoInfo))
-		return
+		messages.Reply = "消息含有特殊字符! "
+		return messages
 	}
 	messages = WXAPI(messages)
 	if messages.Reply != "" {
-		if _, err = message.Say(fmt.Sprintf("@%s\u2005%s", messages.UserName, messages.Reply)); err != nil {
-			ErrorFormat("SayMsg", err)
+		if messages.Status {
+			if _, err = message.Say(fmt.Sprintf("@%s\u2005%s", messages.UserName, messages.Reply)); err != nil {
+				ErrorFormat("wx群聊回复消息失败, Error:", err)
+				messages.Reply = "wx群聊回复消息失败"
+				return messages
+			}
+		} else {
+			if _, err = message.Say(messages.Reply); err != nil {
+				ErrorFormat("wx私聊回复消息失败, Error:", err)
+				messages.Reply = "wx私聊回复消息失败"
+				return messages
+			}
 		}
 	} else {
+		ErrorFormat("Error:", errors.New("wx获取回复失败"))
 		// 图灵API
 		messages = TulingMessage(messages)
 		if messages.Reply != "" {
-			if _, err = message.Say(fmt.Sprintf("@%s\u2005%s", messages.UserName, messages.Reply)); err != nil {
-				ErrorFormat("SayMsg", err)
+			if messages.Status {
+				if _, err = message.Say(fmt.Sprintf("@%s\u2005%s", messages.UserName, messages.Reply)); err != nil {
+					ErrorFormat("图灵群聊回复消息失败, Error:", err)
+					messages.Reply = "图灵群聊回复消息失败"
+					return messages
+				}
+			} else {
+				if _, err = message.Say(messages.Reply); err != nil {
+					ErrorFormat("图灵私聊回复消息失败, Error:", err)
+					messages.Reply = "图灵私聊回复消息失败"
+					return messages
+				}
 			}
+		} else {
+			ErrorFormat("图灵获取回复失败, Error:", err)
+			messages.Reply = "图灵获取回复失败"
+			return messages
 		}
 	}
+	return messages
 }
 
 func groupChat(messages MessageInfo, message *user.Message) {
@@ -370,12 +398,12 @@ func privateChat(messages MessageInfo, message *user.Message) {
 			}
 			log.Printf("用户输入: [%s] i:[%v] i.key: [%s]", messages.Content, i, v)
 		}
-		if _, err = message.Say("当前群聊我也没有权限,请重新输入!"); err != nil {
-			ErrorFormat("群聊权限不足消息发送失败", err)
-		} else {
-			SuccessFormat("群聊权限不足消息发送成功!")
-		}
-		return
+		//if _, err = message.Say("当前群聊我也没有权限,请重新输入!"); err != nil {
+		//	ErrorFormat("群聊权限不足消息发送失败", err)
+		//} else {
+		//	SuccessFormat("群聊权限不足消息发送成功!")
+		//}
+		//return
 	}
 	SayMessage(messages, message)
 }
@@ -392,9 +420,9 @@ func onMessage(context *Context, message *user.Message) {
 		}
 		messages := EncodeMessage(message)
 		if message.Room() != nil { // 群聊
-			go groupChat(messages, message)
+			groupChat(messages, message)
 		} else { // 私聊
-			go privateChat(messages, message)
+			privateChat(messages, message)
 		}
 		log.Println(messages.AutoInfo)
 		go ExportMessages(messages)

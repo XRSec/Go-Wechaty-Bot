@@ -27,7 +27,6 @@ func TulingMessage(messages MessageInfo) MessageInfo {
 		// 发送请求
 		tulingWebhook := viper.GetString("Tuling.URL") + viper.GetString("Tuling.TOKEN")
 		if resp, err = http.Get(tulingWebhook + url.QueryEscape(messages.Content)); err != nil {
-			log.Printf("%s机器人请求错误: %s\n", viper.GetString("faild"), err)
 			ErrorFormat("图灵机器人请求错误: ", err)
 		} else {
 			if err = json.NewDecoder(resp.Body).Decode(&tulingBotResult); err != nil {

@@ -69,7 +69,6 @@ func WXAPI(messages MessageInfo) MessageInfo {
 									messages.Reply = answer.Answer
 									log.Printf("wx 机器人 回复信息: %+v", messages.Reply)
 									messages.AutoInfo += " 回复: [" + messages.Reply + "]"
-									//log.Printf("WXopenai.TOKEN:[%s] messages.UserName:[%s], messages.UserID:[%s] wxSession.Signature:[%s] messages.Content:[%v] WXopenai.ENV:[%s] answer:[%v]", viper.GetString("WXopenai.TOKEN"), messages.UserName, messages.UserID, wxSession.Signature, messages.Content, viper.GetString("WXopenai.ENV"), answer)
 								} else {
 									log.Println("wx 机器人 回复信息为空")
 								}

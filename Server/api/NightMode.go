@@ -22,7 +22,7 @@ func NightMode(userID string) bool {
 	//使用time的Before和After方法，判断当前时间是否在参数的时间范围
 	if userID == viper.GetString("bot.adminid") {
 		log.Println("管理员")
-		return true
+		return false
 	} else {
 		return now.Before(timeEnd) && now.After(timeStart)
 	}
