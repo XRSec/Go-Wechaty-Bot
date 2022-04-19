@@ -14,5 +14,6 @@ wechaty:
 wxopenai:
   env: online
   token: xxxxxxxxxxxxxxxxxxxxx
+  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
 group:
   xxxxx: xxxxx@chatroom

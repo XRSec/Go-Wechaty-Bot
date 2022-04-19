@@ -210,8 +210,8 @@ github.com/tuotoo/qrcode v0.0.0-20190222102259-ac9c44189bf2/go.mod h1:lPnW9HVS0v
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/wechaty/go-grpc v0.18.12 h1:uHGKugN0/7d0vnrJ0CSwyfULwOA0Z1lf72wVowHILqg=
 github.com/wechaty/go-grpc v0.18.12/go.mod h1:gtyrRa9Ts5KGzQh61CIytAYyE9HmVna6yFRamKN4udk=
-github.com/wechaty/go-wechaty v0.3.8 h1:mSxx13YbD5OP+5pzEkzNtDDYM9UnEZYgcVrpA+XpIVQ=
-github.com/wechaty/go-wechaty v0.3.8/go.mod h1:perp6jTZRMeOYXP5z99eVGhFLhbI7KH8PuZX7FqCFFg=
+github.com/wechaty/go-wechaty v0.3.9 h1:U6wJpAabQeODku39xy54bk5RArWES6V2x4TKB5l36aQ=
+github.com/wechaty/go-wechaty v0.3.9/go.mod h1:perp6jTZRMeOYXP5z99eVGhFLhbI7KH8PuZX7FqCFFg=
 github.com/willf/bitset v1.1.10 h1:NotGKqX0KwQ72NUzqrjZq5ipPNDQex9lo3WpaS8L2sc=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

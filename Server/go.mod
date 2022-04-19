@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/spf13/viper v1.11.0
-	github.com/wechaty/go-wechaty v0.3.8
+	github.com/wechaty/go-wechaty v0.3.9
 )
 
 require (
