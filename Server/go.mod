@@ -4,11 +4,15 @@ go 1.18
 
 require (
 	github.com/mdp/qrterminal/v3 v3.0.0
+	github.com/orcaman/concurrent-map v1.0.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0
 	github.com/wechaty/go-wechaty v0.3.9
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
+	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
