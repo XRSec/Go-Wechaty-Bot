@@ -3,6 +3,7 @@ package Plug
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"strings"
 	"wechatBot/General"
 
@@ -15,10 +16,19 @@ var (
 )
 
 func Manage(message *user.Message) {
+	if message.Type() != schemas.MessageTypeText {
+		return
+	}
+	if message.Self() {
+		return
+	}
 	if !General.ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) { // 消息频率限制，可能会存在 map问题
 		return
 	}
 	if General.Messages.ReplyStatus {
+		return
+	}
+	if !message.MentionSelf() {
 		return
 	}
 	if strings.Contains(message.MentionText(), "djs") {

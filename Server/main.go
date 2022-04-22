@@ -191,7 +191,7 @@ func onMessage(context *Context, message *user.Message) {
 	Plug.AdminManage(message)
 	Plug.Manage(message)
 	Plug.AutoReply(message)
-	General.ExportMessages(message)
+	go General.ExportMessages(message)
 }
 
 func daemonStart() {

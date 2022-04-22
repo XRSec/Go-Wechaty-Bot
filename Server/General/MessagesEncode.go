@@ -30,13 +30,17 @@ type (
 var Messages = MessageInfo{}
 
 func EncodeMessage(message *user.Message) {
+	if message.Type() != schemas.MessageTypeText {
+		Messages.Content = "未知消息类型" + message.Text()
+	} else {
+		Messages.Content = message.Text()
+	}
 	Messages.Date = message.Date().Format("2006-01-02 15:04:05")
 	Messages.Status = false
 	Messages.AtMe = false
 	Messages.UserName = message.From().Name()
 	Messages.UserID = message.From().ID()
-	Messages.Content = message.Text()
-	Messages.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v] 回复: ", Messages.UserID, Messages.UserName, strings.Replace(message.Text(), "\u2005", " ", -1))
+	Messages.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v] 回复: ", Messages.UserID, Messages.UserName, strings.Replace(Messages.Content, "\u2005", " ", -1))
 	Messages.RoomName = ""
 	Messages.RoomID = ""
 	Messages.Reply = ""
@@ -53,9 +57,6 @@ func EncodeMessage(message *user.Message) {
 }
 
 func ExportMessages(message *user.Message) {
-	if message.Type() != schemas.MessageTypeText {
-		return
-	}
 	var (
 		fp       *os.File
 		filename = viper.GetString("rootPath") + "/data.json"

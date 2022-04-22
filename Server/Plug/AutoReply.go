@@ -11,12 +11,6 @@ import (
 )
 
 func AutoReply(message *user.Message) {
-	if !General.ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) { // 消息频率限制，可能会存在 map问题
-		return
-	}
-	if General.Messages.ReplyStatus {
-		return
-	}
 	if message.Type() != schemas.MessageTypeText {
 		return
 	}
@@ -24,13 +18,23 @@ func AutoReply(message *user.Message) {
 		return
 	}
 	if message.Age() > 2*60*time.Second {
+		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
+		return
+	}
+	if !General.ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) { // 消息频率限制，可能会存在 map问题
+		return
+	}
+	if General.Messages.ReplyStatus {
+		return
+	}
+	if message.Age() > 2*60*time.Second {
 		log.Errorf("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
-	if message.Room() != nil {
-		if !message.MentionSelf() {
-			return
-		}
-	}
+	//if message.Room() != nil { // TODO 这是干嘛的？
+	//	if !message.MentionSelf() {
+	//		return
+	//	}
+	//}
 	General.SayMessage(message, "")
 }
