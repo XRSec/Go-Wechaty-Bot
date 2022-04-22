@@ -12,8 +12,10 @@ import (
 )
 
 func AdminManage(message *user.Message) {
-	// map 加锁
-	if viper.GetString(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID())) == "true" {
+	if !General.ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) { // 消息频率限制，可能会存在 map问题
+		return
+	}
+	if General.Messages.ReplyStatus {
 		return
 	}
 	if message.Room() == nil {
@@ -63,7 +65,7 @@ func AdminManage(message *user.Message) {
 			General.SayMessage(message, fmt.Sprintf("从群聊中移除用户失败, 用户: [%s]", deleteUserName))
 			return
 		}
-		viper.Set(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID()), true)
+		General.Messages.ReplyStatus = true
 		return
 	}
 	if message.MentionText() == "quit" { // 退群
@@ -73,7 +75,7 @@ func AdminManage(message *user.Message) {
 			General.SayMessage(message, fmt.Sprintf("退出群聊失败, 群聊名称: [%s], Error: [%v]", message.Room().Topic(), err))
 			return
 		}
-		viper.Set(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID()), true)
+		General.Messages.ReplyStatus = true
 		log.Printf("退出群聊成功! 群聊名称: [%s]", message.Room().Topic())
 		return
 	}
@@ -87,7 +89,7 @@ func AdminManage(message *user.Message) {
 			return
 		}
 		log.Printf("修改用户名成功! 新的名称: %s", newName)
-		viper.Set(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID()), true)
+		General.Messages.ReplyStatus = true
 		return
 	}
 }

@@ -44,6 +44,7 @@ var (
 	tulingBotResult TulingBotResult
 	dingBotResult   DingBotResult
 	resp            *http.Response
+	lastDate        time.Time
 )
 
 func NightMode(userID string) bool {
@@ -62,13 +63,31 @@ func NightMode(userID string) bool {
 	//使用time的Before和After方法，判断当前时间是否在参数的时间范围
 	if userID == viper.GetString("bot.adminid") {
 		log.Println("[NightMode] 管理员")
-		return false
+		return true
 	} else {
-		return now.Before(timeEnd) && now.After(timeStart)
+		return !(now.Before(timeEnd) && now.After(timeStart))
 	}
 }
+func ChatTimeLimit(date string) bool {
+	//当前时间
+	if date == "" {
+		return true
+	}
+	now := time.Now()
+	if lastDate, err = time.Parse("2006-01-02 15:04:05", date); err != nil {
+		log.Errorf("[ChatTimeLimit] 时间转换错误, Error: [%s], Date: [%s]", err, date)
+		return false
+	}
+	//计算两个时间相差的秒数
+	second := int(now.Sub(lastDate).Seconds())
+	if second < 30 {
+		log.Println("[ChatTimeLimit] 时间相差不足")
+		return false
+	}
+	return true
+}
 
-func TulingMessage(message *user.Message, msg string) string {
+func TulingMessage(msg string) string {
 	// 发送请求
 	tulingWebhook := viper.GetString("Tuling.URL") + viper.GetString("Tuling.TOKEN")
 	if resp, err = http.Get(tulingWebhook + url.QueryEscape(msg)); err != nil {
@@ -96,13 +115,13 @@ func TulingMessage(message *user.Message, msg string) string {
 	return tulingBotResult.Text
 }
 
-func DingMessage(msg string) string {
+func DingMessage(msg string) {
 	dingWebHook := viper.GetString("Ding.URL") + viper.GetString("Ding.TOKEN")
 	content := fmt.Sprintf(" {\"msgtype\": \"text\",\"text\": {\"content\": \"%s %s\"}}", viper.GetString("Ding.KEYWORD"), msg)
 	// 发送请求
 	if resp, err = http.Post(dingWebHook, "application/json; charset=utf-8", strings.NewReader(content)); err != nil {
 		log.Errorf("[Ding] 机器人请求错误: %s", err)
-		return ""
+		return
 	}
 	// 关闭请求
 	defer func(Body io.ReadCloser) {
@@ -112,14 +131,13 @@ func DingMessage(msg string) string {
 	}(resp.Body)
 	if err = json.NewDecoder(resp.Body).Decode(&dingBotResult); err != nil {
 		log.Errorf("[Ding] 机器人请求错误: %s", err)
-		return ""
+		return
 	}
 	if dingBotResult.Errcode == 0 {
 		log.Println("[Ding] 消息发送成功!")
 	} else {
 		log.Errorf("[Ding] 消息发送失败: [%s]", err)
 	}
-	return dingBotResult.Errmsg
 }
 
 func WXAPI(message *user.Message, msg string) string {
@@ -197,22 +215,26 @@ func WXAPI(message *user.Message, msg string) string {
 }
 
 func SayMessage(message *user.Message, msg string) {
-	if NightMode(message.From().ID()) {
+	if !NightMode(message.From().ID()) { // 夜间模式
 		return
 	}
 	if msg == "" {
 		if msg = WXAPI(message, message.MentionText()); msg == "" {
-			if msg = TulingMessage(message, message.MentionText()); msg == "" {
+			if msg = TulingMessage(message.MentionText()); msg == "" {
 				msg = "我也不知道呀!"
 			}
 		}
 	}
-	if _, err = message.Say(msg); err != nil {
-		log.Errorf("[SayMessage] [%s], error: %v", msg, err)
-		return
-	}
-	//log.Printf("[SayMessage] [%s]", msg)
-	viper.Set(fmt.Sprintf("Chat.%s.Reply", message.From().ID()), msg)
-	viper.Set(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID()), true)
+	//if _, err = message.Say(msg); err != nil {
+	//	log.Errorf("[SayMessage] [%s], error: %v", msg, err)
+	//	return
+	//}
+	// TODO 0.79 私聊有问题
+	_, _ = message.Say(msg)
+	Messages.Reply = msg
+	Messages.ReplyStatus = true
+	Messages.AutoInfo = Messages.AutoInfo + "[" + msg + "]"
+	viper.Set(fmt.Sprintf("Chat.%v.Date", message.From().ID()), Messages.Date)
+	DingMessage(Messages.AutoInfo)
 	return
 }

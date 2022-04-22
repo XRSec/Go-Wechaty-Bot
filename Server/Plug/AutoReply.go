@@ -11,7 +11,10 @@ import (
 )
 
 func AutoReply(message *user.Message) {
-	if viper.GetString(fmt.Sprintf("Chat.%s.ReplyStatus", message.From().ID())) == "true" {
+	if !General.ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) { // 消息频率限制，可能会存在 map问题
+		return
+	}
+	if General.Messages.ReplyStatus {
 		return
 	}
 	if message.Type() != schemas.MessageTypeText {
