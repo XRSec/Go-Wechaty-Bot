@@ -1,3 +1,7 @@
+## 04/22
+- 新增时间限制 ChatTimeLimit
+- 修改夜间模式逻辑 NightMode
+
 ## 04/19
 
 - 修复 TLS 错误
