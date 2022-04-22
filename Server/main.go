@@ -6,9 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	. "github.com/wechaty/go-wechaty/wechaty"
-	"github.com/wechaty/go-wechaty/wechaty-puppet"
+	puppet "github.com/wechaty/go-wechaty/wechaty-puppet"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
-	"github.com/wechaty/go-wechaty/wechaty/interface"
+	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
 	"os"
 	"os/signal"
@@ -33,11 +33,11 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 			QuietZone: 1,
 		})
 		fmt.Printf("\n\n")
-		log.Printf("%s[Scan] https://wechaty.js.org/qrcode/%s %s", viper.GetString("info"), qrCode, data)
+		log.Printf("%v[Scan] https://wechaty.js.org/qrcode/%v %v", viper.GetString("info"), qrCode, data)
 	} else if status.String() == "ScanStatusScanned" {
-		log.Printf("%s[Scan] Status: %s %s\n", viper.GetString("info"), status.String(), data)
+		log.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
 	} else {
-		log.Printf("%s[Scan] Status: %s %s\n", viper.GetString("info"), status.String(), data)
+		log.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
 	}
 }
 
@@ -46,21 +46,21 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 	@param {*} user
 */
 func onLogin(context *Context, user *user.ContactSelf) {
-	fmt.Printf(`%s
+	fmt.Printf(`%v
                            //
                \\         //
                 \\       //
-        ## DDDDDDDDDDDDDDDDDDDD ##      
-        ## DDDDDDDDDDDDDDDDDDDD ##      
-        ## hh                hh ##      ##         ## ## ## ##   ## ## ## ###   ##    ####     ##     
+        ## DDDDDDDDDDDDDDDDDDDD ##
+        ## DDDDDDDDDDDDDDDDDDDD ##
+        ## hh                hh ##      ##         ## ## ## ##   ## ## ## ###   ##    ####     ##
         ## hh    //    \\    hh ##      ##         ##       ##   ##             ##    ## ##    ##
         ## hh   //      \\   hh ##      ##         ##       ##   ##             ##    ##   ##  ##
         ## hh                hh ##      ##         ##       ##   ##     ##      ##    ##    ## ##
         ## hh      wwww      hh ##      ##         ##       ##   ##       ##    ##    ##     ####
         ## hh                hh ##      ## ## ##   ## ## ## ##   ## ## ## ###   ##    ##      ###
-        ## MMMMMMMMMMMMMMMMMMMM ##    
-        ##MMMMMMMMMMMMMMMMMMMMMM##      微信机器人: [%s] 已经登录成功了。
-        %s`, "\n", user.Name(), "\n")
+        ## MMMMMMMMMMMMMMMMMMMM ##
+        ##MMMMMMMMMMMMMMMMMMMMMM##      微信机器人: [%v] 已经登录成功了。
+        %v`, "\n", user.Name(), "\n")
 	viper.Set("bot.name", user.Name())
 }
 
@@ -79,20 +79,24 @@ func onLogout(context *Context, user *user.ContactSelf, reason string) {
 func onRoomInvite(context *Context, roomInvitation *user.RoomInvitation) {
 	fmt.Println("========================onRoomInvite👇========================")
 	// TODO 自动通过群聊申请有问题 待解决(官方的问题)
+	var (
+		inviter  _interface.IContact
+		roomName string
+	)
 	if err = roomInvitation.Accept(); err != nil {
-		log.Errorf("[RoomInvite] Error: %s", err)
-	} else {
-		if inviter, err := roomInvitation.Inviter(); err != nil {
-			log.Errorf("[RoomInvite] 获取用户属性失败, Error: %s", err)
-		} else {
-			if roomName, err := roomInvitation.Topic(); err != nil {
-				log.Errorf("[RoomInvite] 获取群聊名称失败, Error: %s", err)
-			} else {
-				log.Printf("[RoomInvite] 通过群聊邀请, 群聊名称: [%s] 邀请人: [%s]", roomName, inviter.Name())
-				// 机器人进群自我介绍 onRoomJoin 已经实现
-			}
-		}
+		log.Errorf("[RoomInvite] Error: %v", err)
+		return
 	}
+	if inviter, err = roomInvitation.Inviter(); err != nil {
+		log.Errorf("[RoomInvite] 获取用户属性失败, Error: %v", err)
+		return
+	}
+	if roomName, err = roomInvitation.Topic(); err != nil {
+		log.Errorf("[RoomInvite] 获取群聊名称失败, Error: %v", err)
+		return
+	}
+	log.Printf("[RoomInvite] 通过群聊邀请, 群聊名称: [%v] 邀请人: [%v]", roomName, inviter.Name())
+	// 机器人进群自我介绍 onRoomJoin 已经实现
 }
 
 /*
@@ -111,19 +115,20 @@ func onRoomJoin(context *Context, room *user.Room, inviteeList []_interface.ICon
 	fmt.Println("========================onRoomJoin👇========================")
 	newUser := inviteeList[0].Name()
 	if inviteeList[0].Self() {
-		log.Printf("机器人加入群聊, 群聊名称:[%s] ,邀请人: [%s], 时间: [%s]", room.Topic(), inviter.Name(), date)
-		if _, err = room.Say(fmt.Sprintf("大家好呀.我是%s, 以后请多多关照!", newUser)); err != nil {
-			log.Errorf("[onRoomJoin] 加入群聊自我介绍消息发送失败, Error: %s", err)
+		log.Printf("机器人加入群聊, 群聊名称:[%v] ,邀请人: [%v], 时间: [%v]", room.Topic(), inviter.Name(), date)
+		if _, err = room.Say(fmt.Sprintf("大家好呀.我是%v, 以后请多多关照!", newUser)); err != nil {
+			log.Errorf("[onRoomJoin] 加入群聊自我介绍消息发送失败, Error: %v", err)
+			return
 		} else {
 			log.Printf("[onRoomJoin] 加入群聊自我介绍消息发送成功")
+			return
 		}
+	}
+	log.Printf("群聊名称: [%v], 新人: [%v], 邀请人: [%v], 时间: [%v]", room.Topic(), newUser, inviter.Name(), date)
+	if _, err = room.Say(fmt.Sprintf("@%v 欢迎新人!", newUser)); err != nil {
+		log.Errorf("[onRoomJoin] 欢迎新人加入群聊消息发送失败, Error: %v", err)
 	} else {
-		log.Printf("群聊名称: [%s], 新人: [%s], 邀请人: [%s], 时间: [%s]", room.Topic(), newUser, inviter.Name(), date)
-		if _, err = room.Say(fmt.Sprintf("@%s 欢迎新人!", newUser)); err != nil {
-			log.Errorf("[onRoomJoin] 欢迎新人加入群聊消息发送失败, Error: %s", err)
-		} else {
-			log.Printf("[onRoomJoin] 欢迎新人加入群聊消息发送成功")
-		}
+		log.Printf("[onRoomJoin] 欢迎新人加入群聊消息发送成功")
 	}
 }
 
@@ -133,7 +138,7 @@ func onRoomJoin(context *Context, room *user.Room, inviteeList []_interface.ICon
 */
 func onRoomleave(context *Context, room *user.Room, leaverList []_interface.IContact, remover _interface.IContact, date time.Time) {
 	fmt.Println("========================onRoomleave👇========================")
-	fmt.Printf("[onRoomleave] 群聊名称: [%s] 用户[%s] 被移出群聊", room.Topic(), leaverList[0].Name())
+	fmt.Printf("[onRoomleave] 群聊名称: [%v] 用户[%v] 被移出群聊", room.Topic(), leaverList[0].Name())
 }
 
 func onFriendship(context *Context, friendship *user.Friendship) {
@@ -145,28 +150,28 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 		1. 新的好友请求
 	*/
 	case 1: // FriendshipTypeConfirm
-		//log.Printf("friend ship confirmed with%s", friendship.Contact().Name())
+		//log.Printf("friend ship confirmed with%v", friendship.Contact().Name())
 
 	/*
 		2. 通过好友申请
 	*/
 	case 2: // FriendshipTypeReceive
 		if err = friendship.Accept(); err != nil {
-			//ErrorFormat(fmt.Sprintf("添加好友失败, 好友名称: [%s], Error: ", friendship.Contact().Name()), err)
-			log.Errorf("[onFriendship] 添加好友失败, 好友名称: [%s], Error: [%s]", friendship.Contact().Name(), err)
-		} else {
-			log.Printf("[onFriendship] 添加好友成功, 好友名称:%s", friendship.Contact().Name())
+			log.Errorf("[onFriendship] 添加好友失败, 好友名称: [%v], Error: [%v]", friendship.Contact().Name(), err)
+			return
 		}
-
+		log.Printf("[onFriendship] 添加好友成功, 好友名称:%v", friendship.Contact().Name())
 	case 3: // FriendshipTypeVerify
-		if err = friendship.GetWechaty().Friendship().Add(friendship.Contact(), fmt.Sprintf("你好,我是%s,以后请多多关照!", viper.GetString("bot.name"))); err != nil {
-			log.Errorf("[onFriendship] 添加好友失败, 好友名称: [%s], Error: [%s]", friendship.Contact().Name(), err)
-		} else {
-			log.Printf("[onFriendship] 添加好友成功, 好友名称:%s", friendship.Contact().Name())
+		if err = friendship.GetWechaty().Friendship().Add(friendship.Contact(), fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("bot.name"))); err != nil {
+			log.Errorf("[onFriendship] 添加好友失败, 好友名称: [%v], Error: [%v]", friendship.Contact().Name(), err)
+			return
 		}
+		log.Printf("[onFriendship] 添加好友成功, 好友名称:%v", friendship.Contact().Name())
+
 	default:
+		//	NONE
 	}
-	log.Printf("[onFriendship] %s好友关系是: %s Hello: %s ", friendship.Contact().Name(), friendship.Type(), friendship.Hello())
+	log.Printf("[onFriendship] %v好友关系是: %v Hello: %v ", friendship.Contact().Name(), friendship.Type(), friendship.Hello())
 }
 
 /*
@@ -175,26 +180,31 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 */
 func onHeartbeat(context *Context, data string) {
 	fmt.Println("========================onHeartbeat👇========================")
-	log.Printf("[onHeartbeat] 获取机器人的心跳: %s", data)
+	log.Printf("[onHeartbeat] 获取机器人的心跳: %v", data)
 }
 
 func onError(context *Context, err error) {
-	log.Errorf("[onError] Error: [%s]", err)
+	log.Errorf("[onError] Error: [%v]", err)
 }
 
 func onMessage(context *Context, message *user.Message) {
 	// 编码信息
 	General.EncodeMessage(message) // map 加锁
+	// Debug Model
 	//if message.From().ID() != viper.GetString("bot.adminid") {
 	//	return
 	//}
 	Plug.AdminManage(message)
 	Plug.Manage(message)
 	Plug.AutoReply(message)
+	if message.MentionSelf() {
+		// 到这里的时候基本设置好了一些默认的值了
+		Plug.DingMessage(General.Messages.AutoInfo)
+	}
 	go General.ExportMessages(message)
 }
 
-func daemonStart() {
+func main() {
 	i := 0
 	// 重试次数 10
 	defer func() {
@@ -206,13 +216,13 @@ func daemonStart() {
 		i++
 		// 钉钉推送
 		General.WechatBotInit()
-		var bot = NewWechaty(WithPuppetOption(wechatypuppet.Option{
+		var bot = NewWechaty(WithPuppetOption(puppet.Option{
 			Token:    viper.GetString("wechaty.token"),
 			Endpoint: viper.GetString("wechaty.endpoint"),
 		}))
-		log.Printf("Token: %s", viper.GetString("wechaty.token"))
-		log.Printf("Endpoint: %s", viper.GetString("wechaty.endpoint"))
-		log.Printf("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: [%s]", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT"))
+		log.Printf("Token: %v", viper.GetString("wechaty.token"))
+		log.Printf("Endpoint: %v", viper.GetString("wechaty.endpoint"))
+		log.Printf("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: [%v]", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT"))
 
 		bot.OnScan(onScan).
 			OnLogin(onLogin).
@@ -229,7 +239,7 @@ func daemonStart() {
 
 		if err = bot.Start(); err != nil {
 			// 重启Bot
-			log.Printf("[main] Bot 错误: %s", err)
+			log.Printf("[main] Bot 错误: %v", err)
 			if i > 10 {
 				os.Exit(0)
 			}
@@ -247,8 +257,4 @@ func daemonStart() {
 			}
 		}
 	}
-}
-
-func main() {
-	daemonStart()
 }

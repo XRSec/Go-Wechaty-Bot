@@ -2,21 +2,20 @@ package General
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
 	"path"
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var (
-	err  error
-	Smap sync.Map
+	err error
 )
 
 func init() {
@@ -30,17 +29,23 @@ func init() {
 	viperInit()
 }
 
+/*
+	初始化日志
+*/
 func viperInit() {
 	// 初始化配置文件
 	fileInit(false, viper.GetString("rootPath"))
-	log.Printf("Viper Config Path: [%s]", viper.GetString("rootPath")+"/config.yaml")
-	log.Printf("Logs Path: [%s]", viper.GetString("logPath"))
+	log.Printf("Viper Config Path: [%v]", viper.GetString("rootPath")+"/config.yaml")
+	log.Printf("Logs Path: [%v]", viper.GetString("logPath"))
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(viper.GetString("rootPath"))
 	fileInit(false, viper.GetString("rootPath")+"/config.yaml")
 }
 
+/*
+	初始化日志
+*/
 func logInit() {
 	// 设置日志格式
 	// 创建日志文件夹
@@ -50,7 +55,7 @@ func logInit() {
 	log.SetFormatter(&log.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
-			fileName := fmt.Sprintf(" %s:%s ", path.Base(frame.File), strconv.Itoa(frame.Line))
+			fileName := fmt.Sprintf(" %v:%v ", path.Base(frame.File), strconv.Itoa(frame.Line))
 			function = strings.Replace(path.Ext(frame.Function), ".", "", -1)
 			return function, fileName
 		},
@@ -65,33 +70,40 @@ func logInit() {
 	}))
 }
 
+/*
+	初始化文件/夹
+*/
 func fileInit(fileAttributes bool, fileName string) {
 	if _, err = os.Stat(fileName); err != nil {
 		if fileAttributes {
 			if err = os.MkdirAll(fileName, os.ModePerm); err != nil {
-				log.Printf("创建[%s] 目录失败, Error: [%s]", fileName, err)
+				log.Printf("创建[%v] 目录失败, Error: [%v]", fileName, err)
 			} else {
-				log.Printf("创建[%s] 目录成功", fileName)
+				log.Printf("创建[%v] 目录成功", fileName)
 			}
 		} else {
 			var f *os.File
 			if f, err = os.Create(fileName); err != nil {
-				log.Printf("创建[%s] 文件失败, Error: [%s]", fileName, err)
+				log.Printf("创建[%v] 文件失败, Error: [%v]", fileName, err)
 			} else {
-				log.Printf("创建[%s] 文件成功", fileName)
+				log.Printf("创建[%v] 文件成功", fileName)
 			}
 			defer func(f *os.File) {
 				if err = f.Close(); err != nil {
-					log.Printf("关闭[%s] 文件失败, Error: [%s]", fileName, err)
+					log.Printf("关闭[%v] 文件失败, Error: [%v]", fileName, err)
 				}
 			}(f)
 		}
 	}
 }
 
+/*
+	WechatBotInit()
+	检查环境变量
+*/
 func WechatBotInit() {
 	if err = viper.ReadInConfig(); err != nil {
-		log.Printf("[viper] 读取配置文件失败, Error: [%s]", err)
+		log.Printf("[viper] 读取配置文件失败, Error: [%v]", err)
 	} else {
 		log.Printf("[viper] 读取配置文件成功")
 	}
@@ -100,26 +112,30 @@ func WechatBotInit() {
 		viper.Set("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", "false")
 	}
 	if err = os.Setenv("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT")); err != nil {
-		log.Errorf("设置环境变量: [WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT] 失败, Error: [%s]", err)
+		log.Errorf("设置环境变量: [WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT] 失败, Error: [%v]", err)
 	}
 	// ENDPOINT
 	if viper.GetString("wechaty.endpoint") == "" {
-		log.Errorf("请填写服务器地址, endpoint: [%s]", viper.GetString("wechaty.endpoint"))
+		log.Errorf("请填写服务器地址, endpoint: [%v]", viper.GetString("wechaty.endpoint"))
 		viper.Set("wechaty.endpoint", "Please Fill In Your Server Address")
 		os.Exit(1)
 	}
 	// TOKEN
 	if viper.GetString("wechaty.token") == "" {
 		viper.Set("wechaty.token", "Please Fill In Your Token")
-		log.Errorf("请填写服务器 Token: [%s]", viper.GetString("wechaty.token"))
+		log.Errorf("请填写服务器 Token: [%v]", viper.GetString("wechaty.token"))
 		os.Exit(1)
 	}
 }
 
+/*
+	ViperWrite()
+	写入配置文件
+*/
 func ViperWrite() {
 	viper.Set("chat", "")
 	if err = viper.WriteConfigAs(viper.ConfigFileUsed()); err != nil {
-		log.Errorf("Viper Write file Error: %s", err)
+		log.Errorf("Viper Write file Error: %v", err)
 	} else {
 		log.Printf("Viper Write file Success")
 	}

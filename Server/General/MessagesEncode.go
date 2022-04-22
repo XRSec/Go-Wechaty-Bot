@@ -29,11 +29,15 @@ type (
 
 var Messages = MessageInfo{}
 
+/*
+	EncodeMessage()
+	对消息内容进行编码
+*/
 func EncodeMessage(message *user.Message) {
 	if message.Type() != schemas.MessageTypeText {
-		Messages.Content = "未知消息类型" + message.Text()
+		Messages.Content = "[未知消息类型: " + message.Type().String() + "] " + message.MentionText()
 	} else {
-		Messages.Content = message.Text()
+		Messages.Content = message.MentionText()
 	}
 	Messages.Date = message.Date().Format("2006-01-02 15:04:05")
 	Messages.Status = false
@@ -52,10 +56,14 @@ func EncodeMessage(message *user.Message) {
 		Messages.RoomName = message.Room().Topic()
 		Messages.RoomID = message.Room().ID()
 		Messages.Status = true
-		Messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %s", Messages.RoomID, Messages.RoomName, Messages.AutoInfo)
+		Messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", Messages.RoomID, Messages.RoomName, Messages.AutoInfo)
 	}
 }
 
+/*
+	ExportMessages()
+	对消息内容进行存储
+*/
 func ExportMessages(message *user.Message) {
 	var (
 		fp       *os.File
@@ -63,26 +71,26 @@ func ExportMessages(message *user.Message) {
 		result   []byte
 	)
 	if result, err = json.Marshal(Messages); err != nil {
-		log.Errorf("[ExportMessages] Json 解析失败! Error: [%s]", err)
+		log.Errorf("[ExportMessages] Json 解析失败! Error: [%v]", err)
 		return
 	}
 	if _, err = os.Stat(filename); err != nil {
-		log.Errorf("[ExportMessages] 聊天备份文件不存在,正在创建! Error: [%s]", err)
+		log.Errorf("[ExportMessages] 聊天备份文件不存在,正在创建! Error: [%v]", err)
 	}
 	if fp, err = os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755); err != nil {
-		log.Errorf("[ExportMessages] 打开聊天备份文件失败! Error: [%s]", err)
+		log.Errorf("[ExportMessages] 打开聊天备份文件失败! Error: [%v]", err)
 	}
 	defer func(fp *os.File) {
 		if err = fp.Close(); err != nil {
-			log.Errorf("[ExportMessages] 关闭聊天备份文件失败! Error: [%s]", err)
+			log.Errorf("[ExportMessages] 关闭聊天备份文件失败! Error: [%v]", err)
 		}
 	}(fp)
 	if _, err = fp.Write(result); err != nil {
-		log.Errorf("[ExportMessages] 写入聊天记录到聊天备份文件失败! Error: [%s]", err)
+		log.Errorf("[ExportMessages] 写入聊天记录到聊天备份文件失败! Error: [%v]", err)
 		return
 	}
 	if _, err = fp.WriteString("\n"); err != nil {
-		log.Errorf("[ExportMessages] 写入换行符到聊天备份文件失败! Error: [%s]", err)
+		log.Errorf("[ExportMessages] 写入换行符到聊天备份文件失败! Error: [%v]", err)
 		return
 	}
 	log.Printf(Messages.AutoInfo)
