@@ -11,9 +11,12 @@ tuling:
 wechaty:
   endpoint: 127.0.0.1:25001
   token: insecure_xxxxxxxxxxxxxxxxxxxxxx
+  wechaty_puppet_service_no_tls_insecure_client: true
 wxopenai:
   env: online
-  token: xxxxxxxxxxxxxxxxxxxxx
-  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
+  signUrl: https://openai.weixin.qq.com/openapi/sign/
+  url: https://openai.weixin.qq.com/openapi/aibot/
+  token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 group:
   xxxxx: xxxxx@chatroom
+
