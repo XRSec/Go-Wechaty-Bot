@@ -9,6 +9,7 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty/user"
 	"os"
 	"strings"
+	"time"
 )
 
 type (
@@ -58,6 +59,51 @@ func EncodeMessage(message *user.Message) {
 		Messages.Status = true
 		Messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", Messages.RoomID, Messages.RoomName, Messages.AutoInfo)
 	}
+	ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", Messages.UserID)))
+}
+
+/*
+	ChatTimeLimit(message.Date().Format("2006-01-02 15:04:05"))
+		: 判断消息是否在规定时间内
+		: 如果是，则返回true，否则返回false
+*/
+func ChatTimeLimit(date string) {
+	//当前时间
+	var (
+		now      time.Time
+		loc      *time.Location
+		lastDate time.Time
+	)
+	if date == "" {
+		return
+	}
+	if Messages.Status && !Messages.AtMe {
+		return
+	}
+	timeNow := time.Now().Format("2006-01-02 15:04:05")
+	if loc, err = time.LoadLocation("Local"); err != nil {
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Loc: [%v]", err, loc)
+		// [ChatTimeLimit] time.ParseInLocation, Error: [The system cannot find the path specified.], Loc: [UTC]
+		return
+	}
+	if now, err = time.ParseInLocation("2006-01-02 15:04:05", timeNow, loc); err != nil {
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Now: [%v]", err, now)
+		return
+	}
+	//当前时间转换为"年-月-日"的格式
+	if lastDate, err = time.ParseInLocation("2006-01-02 15:04:05", date, loc); err != nil {
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Lastdate: [%v]", err, lastDate)
+		return
+	}
+	//计算两个时间相差的秒数
+	if second := int(now.Sub(lastDate).Seconds()); second < 30 {
+		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
+		Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
+		Messages.ReplyStatus = true
+		Messages.AutoInfo = Messages.AutoInfo + "[" + Messages.Reply + "]"
+		return
+	}
+	return
 }
 
 /*

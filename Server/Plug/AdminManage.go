@@ -29,20 +29,15 @@ func AdminManage(message *user.Message) {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
-	// 消息频率限制，可能会存在 map问题
-	if !ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", message.From().ID()))) {
-		return
-	}
-	if General.Messages.ReplyStatus {
-		return
-	}
 	// 以下功能对私聊不开放
-	if message.Room() == nil {
+	if (message.Room() != nil && !message.MentionSelf()) || message.Room() == nil { // 不允许私聊
+		log.Printf("Room Pass, %v:%v", message.From().Name(), message.Text())
 		return
 	}
-	if !message.MentionSelf() {
+	if General.Messages.ReplyStatus { // 是否回复过这条消息
 		return
 	}
+
 	if message.From().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放
 		log.Printf("%v is not admin", message.From().ID())
 		return

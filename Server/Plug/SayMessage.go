@@ -12,10 +12,6 @@ import (
 	"wechatBot/General"
 )
 
-var (
-	lastDate time.Time
-)
-
 /*
 	func NightMode(message.From().ID())
 	: 管理员 返回 true
@@ -44,43 +40,6 @@ func NightMode(userID string) bool {
 }
 
 /*
-	ChatTimeLimit(message.Date().Format("2006-01-02 15:04:05"))
-		: 判断消息是否在规定时间内
-		: 如果是，则返回true，否则返回false
-*/
-func ChatTimeLimit(date string) bool {
-	//当前时间
-	var (
-		now time.Time
-		loc *time.Location
-	)
-	if date == "" {
-		return true
-	}
-	timeNow := time.Now().Format("2006-01-02 15:04:05")
-	if loc, err = time.LoadLocation("Asia/Shanghai"); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Loc: [%v]", err, loc)
-	}
-	if now, err = time.ParseInLocation("2006-01-02 15:04:05", timeNow, loc); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Now: [%v]", err, now)
-	}
-	//当前时间转换为"年-月-日"的格式
-	if lastDate, err = time.ParseInLocation("2006-01-02 15:04:05", date, loc); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Lastdate: [%v]", err, lastDate)
-		return false
-	}
-	//计算两个时间相差的秒数
-	if second := int(now.Sub(lastDate).Seconds()); second < 30 {
-		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
-		General.Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
-		General.Messages.ReplyStatus = true
-		General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
-		return false
-	}
-	return true
-}
-
-/*
 	如果有自定义消息内容则填写，没有则为空
 	SayMessage(message, "hello word")
 	SayMessage(message, "")
@@ -101,6 +60,10 @@ func SayMessage(message *user.Message, msg string) string {
 	//}
 
 	_, _ = message.Say(msg)
+	General.Messages.Reply = msg
+	General.Messages.ReplyStatus = true
+	General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
+	viper.Set(fmt.Sprintf("Chat.%v.Date", message.From().ID()), General.Messages.Date)
 	return msg
 }
 

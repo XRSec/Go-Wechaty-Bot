@@ -125,6 +125,9 @@ func onRoomJoin(context *Context, room *user.Room, inviteeList []_interface.ICon
 		}
 	}
 	log.Printf("群聊名称: [%v], 新人: [%v], 邀请人: [%v], 时间: [%v]", room.Topic(), newUser, inviter.Name(), date)
+	if !Plug.NightMode(inviter.ID()) {
+		return
+	}
 	if _, err = room.Say(fmt.Sprintf("@%v 欢迎新人!", newUser)); err != nil {
 		log.Errorf("[onRoomJoin] 欢迎新人加入群聊消息发送失败, Error: %v", err)
 	} else {
