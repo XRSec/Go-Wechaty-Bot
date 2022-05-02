@@ -30,53 +30,57 @@ func AdminManage(message *user.Message) {
 		return
 	}
 	// 以下功能对私聊不开放
-	if (message.Room() != nil && !message.MentionSelf()) || message.Room() == nil { // 不允许私聊
-		log.Printf("Room Pass, %v:%v", message.From().Name(), message.Text())
-		return
-	}
-	if General.Messages.ReplyStatus { // 是否回复过这条消息
+	if message.Room() == nil { // 不允许私聊
+		log.Printf("Room Pass, %v:%v %v", message.Talker().Name(), message.Text(), message.Room().Topic())
 		return
 	}
 
-	if message.From().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放
-		log.Printf("%v is not admin", message.From().ID())
+	//if !message.MentionSelf() {
+	//	log.Printf("AtMw Pass, %v:%v", message.Talker().Name(), message.Text())
+	//	return
+	//}
+	if General.Messages.ReplyStatus { // 是否回复过这条消息
+		return
+	}
+	if message.Talker().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放
+		log.Printf("%v is not admin", message.Talker().ID())
 		return
 	}
 	if message.MentionText() == "add" { // 添加好友
 		var (
-			addUserName = strings.Replace(strings.Replace(message.Text(), "\u2005", "", -1), fmt.Sprintf("@%vadd @", viper.GetString("bot.name")), "", 1) // 过滤用户名
-			member      _interface.IContact
+			addUser = message.MentionList()[0]
+			member  _interface.IContact
 		)
-		if member, err = message.Room().Member(addUserName); err != nil && member != nil {
-			log.Errorf(fmt.Sprintf("搜索用户名ID失败, 用户名: [%v], 用户信息: [%v]", addUserName, member.String()), err)
-		}
-		log.Printf("搜索用户名ID成功, 用户名: [%v], 用户信息: [%v]", addUserName, member.String())
-		if message.GetWechaty().Contact().Load(member.ID()).Friend() {
-			log.Printf("用户已经是好友, 用户名: [%v], 用户信息: [%v]", addUserName, member.String())
-			SayMessage(message, fmt.Sprintf("用户: [%v] 已经是好友了", addUserName))
+		//if member, err = message.Room().Member(addUserName); err != nil && member != nil {
+		//	log.Errorf(fmt.Sprintf("搜索用户名ID失败, 用户名: [%v], 用户信息: [%v]", addUserName, member.String()), err)
+		//}
+		//log.Printf("搜索用户名ID成功, 用户名: [%v]", addUser.Name())
+		if message.GetWechaty().Contact().Load(addUser.ID()).Friend() {
+			log.Printf("用户已经是好友, 用户名: [%v]", addUser.Name())
+			SayMessage(message, fmt.Sprintf("用户: [%v] 已经是好友了", addUser))
 			return
 		}
 		if err = message.GetWechaty().Friendship().Add(member, fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("bot.name"))); err != nil {
-			log.Errorf("添加好友失败, 用户名: [%v], 用户信息: [%v], Error: [%v]", addUserName, member.String(), err)
-			SayMessage(message, fmt.Sprintf("添加好友失败, 用户: [%v]", addUserName))
+			log.Errorf("添加好友失败, 用户名: [%v], Error: [%v]", addUser, err)
+			SayMessage(message, fmt.Sprintf("添加好友失败, 用户: [%v]", addUser))
 			return
 		}
-		SayMessage(message, fmt.Sprintf("好友申请发送成功, 用户: [%v]", addUserName))
+		SayMessage(message, fmt.Sprintf("好友申请发送成功, 用户: [%v]", addUser))
 		return
 	}
 	if message.MentionText() == "del" { // 从群聊中移除用户
 		var (
-			deleteUserName = strings.Replace(strings.Replace(message.Text(), "\u2005", "", -1), fmt.Sprintf("@%vdel @", viper.GetString("bot.name")), "", 1) // 过滤用户名
-			member         _interface.IContact
+			delUser = message.MentionList()[0]
 		)
-		if member, err = message.Room().Member(deleteUserName); err != nil && member != nil {
-			log.Errorf(fmt.Sprintf("搜索用户名ID失败, 用户名: [%v], 用户信息: [%v]", deleteUserName, member.String()), err)
-			return
-		}
-		log.Printf("搜索用户名ID成功, 用户名: [%v], 用户信息: [%v]", deleteUserName, member.String())
-		if err = message.Room().Del(member); err != nil {
-			log.Errorf("从群聊中移除用户失败, 用户名: [%v], 用户信息: [%v], Error: [%v]", deleteUserName, member.String(), err)
-			SayMessage(message, fmt.Sprintf("从群聊中移除用户失败, 用户: [%v]", deleteUserName))
+		log.Printf(message.MentionText())
+		//if member, err = message.Room().Member(delUser.ID()); err != nil && member != nil {
+		//	log.Errorf(fmt.Sprintf("搜索用户名ID失败, 用户名: [%v], 用户信息: [%v]", delUser.Name(), member.String()), err)
+		//	return
+		//}
+		//log.Printf("搜索用户名ID成功, 用户名: [%v], 用户信息: [%v]", deleteUserName, member.String())
+		if err = message.Room().Del(delUser); err != nil {
+			log.Errorf("从群聊中移除用户失败, 用户名: [%v] Error: [%v]", delUser.Name(), err)
+			SayMessage(message, fmt.Sprintf("从群聊中移除用户失败, 用户: [%v]", delUser.Name()))
 			return
 		}
 		General.Messages.ReplyStatus = true

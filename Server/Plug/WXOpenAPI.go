@@ -3,13 +3,14 @@ package Plug
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 /*
@@ -46,7 +47,7 @@ func WXAPI(message *user.Message) string {
 		viper.GetString("WXopenai.signUrl")+
 			viper.GetString("WXopenai.TOKEN"), "application/json",
 		strings.NewReader(
-			fmt.Sprintf(`{"username":"%v","userid": "%v"}`, message.From().Name(), message.From().ID()),
+			fmt.Sprintf(`{"username":"%v","userid": "%v"}`, message.Talker().Name(), message.Talker().ID()),
 		)); err != nil {
 		log.Errorf("[wx] 请求 signature 接口失败! Error: [%v]", err)
 		return ""

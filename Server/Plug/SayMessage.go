@@ -2,18 +2,19 @@ package Plug
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 	"path"
 	"runtime"
 	"strings"
 	"time"
 	"wechatBot/General"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 /*
-	func NightMode(message.From().ID())
+	func NightMode(message.Talker().ID())
 	: 管理员 返回 true
 	: 凌晨返回 false
 */
@@ -47,7 +48,7 @@ func NightMode(userID string) bool {
 */
 func SayMessage(message *user.Message, msg string) string {
 	log.Printf("消息来自函数: [%v]", Copyright(make([]uintptr, 1)))
-	if !NightMode(message.From().ID()) { // 夜间模式
+	if !NightMode(message.Talker().ID()) { // 夜间模式
 		return "当前处于夜间模式!"
 	}
 	if msg == "" {
@@ -63,7 +64,7 @@ func SayMessage(message *user.Message, msg string) string {
 	General.Messages.Reply = msg
 	General.Messages.ReplyStatus = true
 	General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
-	viper.Set(fmt.Sprintf("Chat.%v.Date", message.From().ID()), General.Messages.Date)
+	viper.Set(fmt.Sprintf("Chat.%v.Date", message.Talker().ID()), General.Messages.Date)
 	return msg
 }
 

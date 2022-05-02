@@ -1,11 +1,12 @@
 package Plug
 
 import (
+	"time"
+	"wechatBot/General"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"time"
-	"wechatBot/General"
 )
 
 /*
@@ -25,7 +26,7 @@ func AutoReply(message *user.Message) {
 	}
 	// 群聊中没有@我则不回复
 	if message.Room() != nil && !message.MentionSelf() { // 允许私聊
-		log.Printf("Room Pass, %v:%v", message.From().Name(), message.Text())
+		log.Printf("Room Pass, %v:%v", message.Talker().Name(), message.Text())
 		return
 	}
 	if General.Messages.ReplyStatus {
@@ -46,5 +47,5 @@ labelSay:
 	SayMessage(message, msg)
 	//General.Messages.ReplyStatus = true
 	//General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
-	//viper.Set(fmt.Sprintf("Chat.%v.Date", message.From().ID()), General.Messages.Date)
+	//viper.Set(fmt.Sprintf("Chat.%v.Date", message.Talker().ID()), General.Messages.Date)
 }

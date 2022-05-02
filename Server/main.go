@@ -2,6 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+	"wechatBot/General"
+	"wechatBot/Plug"
+
 	"github.com/mdp/qrterminal/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -10,12 +17,6 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-	"wechatBot/General"
-	"wechatBot/Plug"
 )
 
 var (
@@ -187,14 +188,14 @@ func onHeartbeat(context *Context, data string) {
 }
 
 func onError(context *Context, err error) {
-	log.Errorf("[onError] Error: [%v]", err)
+	log.Errorf("[onError] Error: [%v] 消息来自函数: [%v]", err, Plug.Copyright(make([]uintptr, 1)))
 }
 
 func onMessage(context *Context, message *user.Message) {
 	// 编码信息
 	General.EncodeMessage(message) // map 加锁
 	// Debug Model
-	//if message.From().ID() != viper.GetString("bot.adminid") {
+	//if message.Talker().ID() != viper.GetString("bot.adminid") {
 	//	return
 	//}
 	Plug.AdminManage(message)
@@ -231,7 +232,7 @@ func main() {
 			OnLogin(onLogin).
 			OnLogout(onLogout).
 			OnMessage(onMessage).
-			//OnRoomInvite(onRoomInvite). // 有问题，暂时不用，等待修复
+			OnRoomInvite(onRoomInvite). // 有问题，暂时不用，等待修复
 			OnRoomTopic(onRoomTopic).
 			OnRoomJoin(onRoomJoin).
 			OnRoomLeave(onRoomleave).

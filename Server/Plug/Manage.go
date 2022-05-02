@@ -23,19 +23,19 @@ var (
 func Manage(message *user.Message) {
 	var reply string
 	if message.Type() != schemas.MessageTypeText {
-		log.Printf("Type Pass, %v:%v", message.From().Name(), message.Text())
+		log.Printf("Type Pass, %v:%v", message.Talker().Name(), message.Text())
 		return
 	}
 	if message.Self() {
-		log.Printf("Self Pass, %v:%v", message.From().Name(), message.Text())
+		log.Printf("Self Pass, %v:%v", message.Talker().Name(), message.Text())
 		return
 	}
 	if message.Room() != nil && !message.MentionSelf() { // 允许私聊
-		log.Printf("Room Pass, %v:%v", message.From().Name(), message.Text())
+		log.Printf("Room Pass, %v:%v", message.Talker().Name(), message.Text())
 		return
 	}
 	if General.Messages.ReplyStatus {
-		log.Printf("ReplyStatus Pass, %v:%v", message.From().Name(), message.Text())
+		log.Printf("ReplyStatus Pass, %v:%v", message.Talker().Name(), message.Text())
 		return
 	}
 	if strings.Contains(message.MentionText(), "djs") {
@@ -61,7 +61,7 @@ func Manage(message *user.Message) {
 			for i, v := range viper.GetStringMap("Group") {
 				if strings.Contains(message.Text(), i) && v != "" {
 					//	邀请好友进群
-					if err = message.GetWechaty().Room().Load(v.(string)).Add(message.From()); err != nil {
+					if err = message.GetWechaty().Room().Load(v.(string)).Add(message.Talker()); err != nil {
 						log.Errorf("邀请好友进群失败, Error: [%v]", err)
 						return
 					}
