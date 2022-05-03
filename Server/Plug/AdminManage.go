@@ -20,26 +20,24 @@ import (
 */
 func AdminManage(message *user.Message) {
 	if message.Type() != schemas.MessageTypeText {
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
 	if message.Self() {
+		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
 	}
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
-	// 以下功能对私聊不开放
-	if message.Room() == nil { // 不允许私聊
-		log.Printf("Room Pass, %v:%v %v", message.Talker().Name(), message.Text(), message.Room().Topic())
+	// 群聊中没有@我则不回复
+	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
+		log.Printf("Room Pass, [%v]", message.Talker().Name())
 		return
 	}
-
-	//if !message.MentionSelf() {
-	//	log.Printf("AtMw Pass, %v:%v", message.Talker().Name(), message.Text())
-	//	return
-	//}
-	if General.Messages.ReplyStatus { // 是否回复过这条消息
+	if General.Messages.ReplyStatus {
+		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
 	if message.Talker().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放

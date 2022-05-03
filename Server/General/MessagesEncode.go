@@ -39,7 +39,7 @@ func EncodeMessage(message *user.Message) {
 	if message.Type() != schemas.MessageTypeText {
 		Messages.Content = "[未知消息类型: " + message.Type().String() + "] " + message.MentionText()
 	} else {
-		Messages.Content = message.MentionText()
+		Messages.Content = message.Text()
 	}
 	Messages.Date = message.Date().Format("2006-01-02 15:04:05")
 	Messages.Status = false

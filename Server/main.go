@@ -25,7 +25,12 @@ var (
 
 func onScan(context *Context, qrCode string, status schemas.ScanStatus, data string) {
 	fmt.Printf("\n\n")
+	i := 0
 	if status.String() == "ScanStatusWaiting" {
+		i++
+		if i > 5 {
+			os.Exit(1)
+		}
 		qrterminal.GenerateWithConfig(qrCode, qrterminal.Config{
 			Level:     qrterminal.L,
 			Writer:    os.Stdout,
@@ -35,6 +40,9 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 		})
 		fmt.Printf("\n\n")
 		log.Printf("%v[Scan] https://wechaty.js.org/qrcode/%v %v", viper.GetString("info"), qrCode, data)
+		messages := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
+		Plug.DingMessage(messages, viper.GetString("bot.adminid"))
+		time.Sleep(120 * time.Second)
 	} else if status.String() == "ScanStatusScanned" {
 		log.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
 	} else {
@@ -195,15 +203,16 @@ func onMessage(context *Context, message *user.Message) {
 	// 编码信息
 	General.EncodeMessage(message) // map 加锁
 	// Debug Model
-	//if message.Talker().ID() != viper.GetString("bot.adminid") {
-	//	return
-	//}
+	if message.Talker().ID() != viper.GetString("bot.adminid") {
+		return
+	}
 	Plug.AdminManage(message)
 	Plug.Manage(message)
 	Plug.AutoReply(message)
+	Plug.FileBox(message)
 	if message.MentionSelf() {
 		// 到这里的时候基本设置好了一些默认的值了
-		Plug.DingMessage(General.Messages.AutoInfo)
+		Plug.DingMessage(fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]\n\n---\n\n**内容**: [%v]\n\n**回复**: [%v]", General.Messages.UserName, General.Messages.UserName, General.Messages.UserID, General.Messages.RoomName, General.Messages.RoomID, General.Messages.Content, General.Messages.Reply), General.Messages.UserID)
 	}
 	go General.ExportMessages(message)
 }

@@ -3,6 +3,7 @@ package Plug
 import (
 	"fmt"
 	"strings"
+	"time"
 	"wechatBot/General"
 
 	"github.com/spf13/viper"
@@ -23,19 +24,24 @@ var (
 func Manage(message *user.Message) {
 	var reply string
 	if message.Type() != schemas.MessageTypeText {
-		log.Printf("Type Pass, %v:%v", message.Talker().Name(), message.Text())
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
 	if message.Self() {
-		log.Printf("Self Pass, %v:%v", message.Talker().Name(), message.Text())
+		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
 	}
-	if message.Room() != nil && !message.MentionSelf() { // 允许私聊
-		log.Printf("Room Pass, %v:%v", message.Talker().Name(), message.Text())
+	if message.Age() > 2*60*time.Second {
+		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
+		return
+	}
+	// 群聊中没有@我则不回复
+	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
+		log.Printf("Room Pass, [%v]", message.Talker().Name())
 		return
 	}
 	if General.Messages.ReplyStatus {
-		log.Printf("ReplyStatus Pass, %v:%v", message.Talker().Name(), message.Text())
+		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
 	if strings.Contains(message.MentionText(), "djs") {
