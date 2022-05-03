@@ -1,15 +1,13 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
-	"github.com/spf13/viper"
-	"io"
 	"log"
 	"net/http"
-	"strings"
 	. "wechatBot/data"
+
+	"github.com/blinkbean/dingtalk"
+	"github.com/spf13/viper"
 )
 
 type DingBotResult struct {
@@ -23,33 +21,45 @@ var (
 	err           error
 )
 
-func DingMessage(messages MessageInfo) {
-	if NightMode(messages.UserID) {
+func DingMessageText(messages, UserID string) {
+	if NightMode(UserID) {
 		log.Println("现在处于夜间模式，请在白天使用")
 		return
 	} else {
-		dingWebHook := viper.GetString("Ding.URL") + viper.GetString("Ding.TOKEN")
-		content := fmt.Sprintf(" {\"msgtype\": \"text\",\"text\": {\"content\": \"%s %s\"}}", viper.GetString("Ding.KEYWORD"), messages.AutoInfo)
-		// 发送请求
-		if resp, err = http.Post(dingWebHook, "application/json; charset=utf-8", strings.NewReader(content)); err != nil {
-			ErrorFormat("机器人请求错误: ", err)
-		} else {
-			if err = json.NewDecoder(resp.Body).Decode(&dingBotResult); err != nil {
-				ErrorFormat("机器人请求错误: ", err)
-			} else {
-				if dingBotResult.Errcode == 0 {
-					SuccessFormat("消息发送成功!")
-				} else {
-					ErrorFormat("消息发送失败: ", err)
-				}
-			}
-		}
-		// 关闭请求
-		defer func(Body io.ReadCloser) {
-			if err = Body.Close(); err != nil {
-				ErrorFormat("关闭请求错误: ", err)
-			}
-		}(resp.Body)
+		cli := dingtalk.InitDingTalk([]string{viper.GetString("Ding.TOKEN")}, viper.GetString("Ding.KEYWORD"))
+		cli.SendTextMessage(messages)
+	}
+	// 	dingWebHook := viper.GetString("Ding.URL") + viper.GetString("Ding.TOKEN")
+	// 	content := fmt.Sprintf(" {\"msgtype\": \"text\",\"text\": {\"content\": \"%s %s\"}}", viper.GetString("Ding.KEYWORD"), messages.AutoInfo)
+	// 	// 发送请求
+	// 	if resp, err = http.Post(dingWebHook, "application/json; charset=utf-8", strings.NewReader(content)); err != nil {
+	// 		ErrorFormat("机器人请求错误: ", err)
+	// 	} else {
+	// 		if err = json.NewDecoder(resp.Body).Decode(&dingBotResult); err != nil {
+	// 			ErrorFormat("机器人请求错误: ", err)
+	// 		} else {
+	// 			if dingBotResult.Errcode == 0 {
+	// 				SuccessFormat("消息发送成功!")
+	// 			} else {
+	// 				ErrorFormat("消息发送失败: ", err)
+	// 			}
+	// 		}
+	// 	}
+	// 	// 关闭请求
+	// 	defer func(Body io.ReadCloser) {
+	// 		if err = Body.Close(); err != nil {
+	// 			ErrorFormat("关闭请求错误: ", err)
+	// 		}
+	// 	}(resp.Body)
+	// }
+}
+func DingMessagePic(messages, UserID string) {
+	if NightMode(UserID) {
+		log.Println("现在处于夜间模式，请在白天使用")
+		return
+	} else {
+		cli := dingtalk.InitDingTalk([]string{viper.GetString("Ding.TOKEN")}, viper.GetString("Ding.KEYWORD"))
+		cli.SendMarkDownMessage("", messages)
 	}
 }
 

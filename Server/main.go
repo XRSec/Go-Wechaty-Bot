@@ -3,13 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/mdp/qrterminal/v3"
-	"github.com/spf13/viper"
-	. "github.com/wechaty/go-wechaty/wechaty"
-	wp "github.com/wechaty/go-wechaty/wechaty-puppet"
-	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
-	. "github.com/wechaty/go-wechaty/wechaty/interface"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 	"log"
 	"os"
 	"os/signal"
@@ -19,6 +12,14 @@ import (
 	"time"
 	. "wechatBot/api"
 	. "wechatBot/data"
+
+	"github.com/mdp/qrterminal/v3"
+	"github.com/spf13/viper"
+	. "github.com/wechaty/go-wechaty/wechaty"
+	wp "github.com/wechaty/go-wechaty/wechaty-puppet"
+	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
+	. "github.com/wechaty/go-wechaty/wechaty/interface"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 var (
@@ -45,7 +46,12 @@ func init() {
 
 func onScan(context *Context, qrCode string, status schemas.ScanStatus, data string) {
 	fmt.Printf("\n\n")
+	i := 0
 	if status.String() == "ScanStatusWaiting" {
+		i++
+		if i > 5 {
+			os.Exit(1)
+		}
 		qrterminal.GenerateWithConfig(qrCode, qrterminal.Config{
 			Level:     qrterminal.L,
 			Writer:    os.Stdout,
@@ -55,6 +61,9 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 		})
 		fmt.Printf("\n\n")
 		log.Printf("%s[Scan] https://wechaty.js.org/qrcode/%s %s\n", viper.GetString("info"), qrCode, data)
+		messages := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
+		DingMessagePic(messages, viper.GetString("bot.adminid"))
+		time.Sleep(120 * time.Second)
 	} else if status.String() == "ScanStatusScanned" {
 		log.Printf("%s[Scan] Status: %s %s\n", viper.GetString("info"), status.String(), data)
 	} else {
@@ -71,15 +80,15 @@ func onLogin(context *Context, user *user.ContactSelf) {
                            //
                \\         //
                 \\       //
-        ## DDDDDDDDDDDDDDDDDDDD ##      
-        ## DDDDDDDDDDDDDDDDDDDD ##      
-        ## hh                hh ##      ##         ## ## ## ##   ## ## ## ###   ##    ####     ##     
+        ## DDDDDDDDDDDDDDDDDDDD ##
+        ## DDDDDDDDDDDDDDDDDDDD ##
+        ## hh                hh ##      ##         ## ## ## ##   ## ## ## ###   ##    ####     ##
         ## hh    //    \\    hh ##      ##         ##       ##   ##             ##    ## ##    ##
         ## hh   //      \\   hh ##      ##         ##       ##   ##             ##    ##   ##  ##
         ## hh                hh ##      ##         ##       ##   ##     ##      ##    ##    ## ##
         ## hh      wwww      hh ##      ##         ##       ##   ##       ##    ##    ##     ####
         ## hh                hh ##      ## ## ##   ## ## ## ##   ## ## ## ###   ##    ##      ###
-        ## MMMMMMMMMMMMMMMMMMMM ##    
+        ## MMMMMMMMMMMMMMMMMMMM ##
         ##MMMMMMMMMMMMMMMMMMMMMM##      微信机器人: [%s] 已经登录成功了。
         %s`, "\n", user.Name(), "\n")
 	viper.Set("bot.name", user.Name())
@@ -91,10 +100,9 @@ func onLogin(context *Context, user *user.ContactSelf) {
 */
 func onLogout(context *Context, user *user.ContactSelf, reason string) {
 	log.Println("========================onLogout👇========================")
-	messages := MessageInfo{
-		AutoInfo: user.Name() + "账号已退出登录, 请检查账号!" + reason,
-	}
-	DingMessage(messages)
+	messages := fmt.Sprintf("%v账号已退出登录, 请检查账号!\n\n---\n\n错误: %v", user.Name(), reason)
+	fmt.Println(messages)
+	DingMessagePic(messages, viper.GetString("bot.adminid"))
 }
 
 /*
@@ -359,7 +367,7 @@ func groupChat(messages MessageInfo, message *user.Message) {
 		}
 		//没有匹配指令,调用机器人回复 记得最后 return
 		SayMessage(messages, message)
-		DingMessage(messages)
+		DingMessageText(messages.AutoInfo, messages.UserID)
 	} // 没有 @我 就老老实实的
 }
 
