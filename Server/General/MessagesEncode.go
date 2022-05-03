@@ -111,7 +111,7 @@ func ChatTimeLimit(date string) {
 	ExportMessages()
 	对消息内容进行存储
 */
-func ExportMessages(message *user.Message) {
+func ExportMessages() {
 	var (
 		fp       *os.File
 		filename = viper.GetString("rootPath") + "/data.json"

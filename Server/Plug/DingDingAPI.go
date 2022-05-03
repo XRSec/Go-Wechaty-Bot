@@ -12,7 +12,11 @@ import (
 func DingMessage(messages, UserID string) {
 	if NightMode(UserID) {
 		cli := dingtalk.InitDingTalk([]string{viper.GetString("Ding.TOKEN")}, viper.GetString("Ding.KEYWORD"))
-		cli.SendMarkDownMessage("", messages)
+		if err := cli.SendMarkDownMessage("", messages); err != nil {
+			log.Errorf("DingMessage Error: %v", err)
+			return
+		}
+
 	} else {
 		log.Println("现在处于夜间模式，请在白天使用")
 		return

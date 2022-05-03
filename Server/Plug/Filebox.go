@@ -15,15 +15,15 @@ func FileBox(message *user.Message) {
 	fileType, fileName := FileType(message)
 	switch fileType {
 	case "pdf":
-		log.Printf(fileType)
+		log.Printf("[fileType:%v] [fileName:%v]", fileType, fileName)
 	case "rar|zip|tar|gz":
-		log.Printf(fileType)
+		log.Printf("[fileType:%v] [fileName:%v]", fileType, fileName)
 	default:
-		log.Printf(fileType)
+		log.Printf("[fileType:%v] [fileName:%v]", fileType, fileName)
 	}
 }
 
-func FileType(message *user.Message) string, string {
+func FileType(message *user.Message) (string, string) {
 	fileType := ""
 	fileName := ""
 	doc := etree.NewDocument()

@@ -214,7 +214,7 @@ func onMessage(context *Context, message *user.Message) {
 		// 到这里的时候基本设置好了一些默认的值了
 		Plug.DingMessage(fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]\n\n---\n\n**内容**: [%v]\n\n**回复**: [%v]", General.Messages.UserName, General.Messages.UserName, General.Messages.UserID, General.Messages.RoomName, General.Messages.RoomID, General.Messages.Content, General.Messages.Reply), General.Messages.UserID)
 	}
-	go General.ExportMessages(message)
+	go General.ExportMessages()
 }
 
 func main() {
