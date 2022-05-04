@@ -3,6 +3,7 @@ module wechatBot
 go 1.18
 
 require (
+	github.com/beevik/etree v1.1.0
 	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0
@@ -11,7 +12,6 @@ require (
 )
 
 require (
-	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/blinkbean/dingtalk v0.0.0-20210905093040-7d935c0f7e19
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
