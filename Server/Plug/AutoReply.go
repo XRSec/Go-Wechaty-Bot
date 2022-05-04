@@ -1,6 +1,7 @@
 package Plug
 
 import (
+	"strings"
 	"time"
 	"wechatBot/General"
 
@@ -26,16 +27,21 @@ func AutoReply(message *user.Message) {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
-	// 群聊中没有@我则不回复
+	// If there is no @me in the group chat, I will not reply
 	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
 		log.Printf("Room Pass, [%v]", message.Talker().Name())
+		return
+	}
+	// All Members Pass
+	if message.MentionSelf() && strings.Contains(message.Text(), "全体成员") {
+		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}
 	if General.Messages.ReplyStatus {
 		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
-	// 处理消息内容
+	// Processing message content
 	var msg string
 	if message.MentionText() == "" {
 		msg = "你想和我说什么呢?"
