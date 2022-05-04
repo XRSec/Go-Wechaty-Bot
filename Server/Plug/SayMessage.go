@@ -60,7 +60,8 @@ func SayMessage(message *user.Message, msg string) string {
 	//	return
 	//}
 
-	_, _ = message.Say(msg)
+	_, err = message.Say(msg)
+	log.Errorf("SayMessage Error: [%v]", err)
 	General.Messages.Reply = msg
 	General.Messages.ReplyStatus = true
 	General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
