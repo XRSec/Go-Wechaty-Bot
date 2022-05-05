@@ -26,6 +26,8 @@ type (
 		AutoInfo    string `json:"autoinfo"`    // 信息一览
 		Reply       string `json:"reply"`       // 自动回复
 		ReplyStatus bool   `json:"replystatus"` // 自动回复状态
+		Pass        string `json:"pass"`        // pass 原因
+		PassStatus  bool   `json:"passstatus"`  // pass 状态
 	}
 )
 
@@ -36,6 +38,18 @@ var Messages = MessageInfo{}
 	对消息内容进行编码
 */
 func EncodeMessage(message *user.Message) {
+	if message.Type() == schemas.MessageTypeRecalled {
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		Messages.Pass = "MessageTypeRecalled"
+		Messages.PassStatus = true
+		return
+	}
+	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		Messages.Pass = "微信团队"
+		Messages.PassStatus = true
+		return
+	}
 	if message.Type() != schemas.MessageTypeText {
 		Messages.Content = "[未知消息类型: " + message.Type().String() + "] " + message.MentionText()
 	} else {
@@ -46,11 +60,12 @@ func EncodeMessage(message *user.Message) {
 	Messages.AtMe = false
 	Messages.UserName = message.Talker().Name()
 	Messages.UserID = message.Talker().ID()
-	Messages.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v] 回复: ", Messages.UserID, Messages.UserName, strings.Replace(Messages.Content, "\u2005", " ", -1))
+	Messages.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v]", Messages.UserID, Messages.UserName, strings.Replace(Messages.Content, "\u2005", " ", -1))
 	Messages.RoomName = ""
 	Messages.RoomID = ""
 	Messages.Reply = ""
 	Messages.ReplyStatus = false
+	Messages.PassStatus = false
 	if message.MentionSelf() {
 		Messages.AtMe = true
 	}
@@ -99,12 +114,13 @@ func ChatTimeLimit(date string) {
 	//计算两个时间相差的秒数
 	if second := int(now.Sub(lastDate).Seconds()); second < 30 {
 		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
-		Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
-		Messages.ReplyStatus = true
-		Messages.AutoInfo = Messages.AutoInfo + "[" + Messages.Reply + "]"
+		// Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
+		Messages.Reply = ""
+		Messages.ReplyStatus = false
+		Messages.Pass = "ChatTimeLimit"
+		Messages.PassStatus = true
 		return
 	}
-	return
 }
 
 /*
@@ -112,6 +128,11 @@ func ChatTimeLimit(date string) {
 	对消息内容进行存储
 */
 func ExportMessages() {
+	if Messages.ReplyStatus {
+		Messages.AutoInfo += fmt.Sprintf(" 回复: [%v]", Messages.Reply)
+	} else if Messages.PassStatus {
+		Messages.AutoInfo += fmt.Sprintf(" Pass: [%v]", Messages.Pass)
+	}
 	var (
 		fp       *os.File
 		filename = viper.GetString("rootPath") + "/data.json"

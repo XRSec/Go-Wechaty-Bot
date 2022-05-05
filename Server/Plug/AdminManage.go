@@ -19,27 +19,42 @@ import (
 	管理员管理
 */
 func AdminManage(message *user.Message) {
+	// MessageTypeText
 	if message.Type() != schemas.MessageTypeText {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
+	// self
 	if message.Self() {
 		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
 	}
+	// TIMEOUT
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
-	// 群聊中没有@我则不回复
+	// If there is no @me in the group chat, I will not reply
 	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
 		log.Printf("Room Pass, [%v]", message.Talker().Name())
 		return
 	}
+	// All Members Pass
+	if message.MentionSelf() && strings.EqualFold(message.Text(), "所有人") {
+		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
+		return
+	}
+	// PassStatus
+	if General.Messages.PassStatus {
+		log.Printf("PassStatus Pass, [%v]", message.Talker().Name())
+		return
+	}
+	// ReplyStatus
 	if General.Messages.ReplyStatus {
 		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
+	// Admin
 	if message.Talker().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放
 		log.Printf("%v is not admin", message.Talker().ID())
 		return
@@ -81,6 +96,7 @@ func AdminManage(message *user.Message) {
 			SayMessage(message, fmt.Sprintf("从群聊中移除用户失败, 用户: [%v]", delUser.Name()))
 			return
 		}
+		General.Messages.Reply = fmt.Sprintf("从群聊中移除用户: [%v]", delUser.Name())
 		General.Messages.ReplyStatus = true
 		return
 	}
@@ -95,7 +111,7 @@ func AdminManage(message *user.Message) {
 		log.Printf("退出群聊成功! 群聊名称: [%v]", message.Room().Topic())
 		return
 	}
-	if strings.Contains(message.MentionText(), "gmz") {
+	if strings.EqualFold(message.MentionText(), "gmz") {
 		var (
 			newName = strings.Replace(message.MentionText(), "gmz ", "", 1)
 		)
@@ -106,6 +122,7 @@ func AdminManage(message *user.Message) {
 		}
 		log.Printf("修改用户名成功! 新的名称: %v", newName)
 		General.Messages.ReplyStatus = true
+		General.Messages.Reply = fmt.Sprintf("改名字: [%v]", newName)
 		return
 	}
 }

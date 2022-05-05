@@ -12,6 +12,34 @@ func FileBox(message *user.Message) {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
+	if message.Type() == schemas.MessageTypeRecalled {
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		return
+	}
+
+	/* TODO MessageType
+	MessageTypeUnknown
+	MessageTypeAttachment
+	MessageTypeAudio
+	MessageTypeContact
+	MessageTypeChatHistory
+	MessageTypeEmoticon
+	MessageTypeImage
+	MessageTypeText
+	MessageTypeLocation
+	MessageTypeMiniProgram
+	MessageTypeGroupNote
+	MessageTypeTransfer
+	MessageTypeRedEnvelope
+	MessageTypeRecalled
+	MessageTypeURL
+	MessageTypeVideo
+	*/
+	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
+		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		return
+	}
+	log.Printf("FileBox, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 	fileType, fileName := FileType(message)
 	switch fileType {
 	case "pdf":

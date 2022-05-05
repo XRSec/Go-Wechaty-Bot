@@ -1,22 +1,27 @@
 package Plug
 
 import (
+	"fmt"
+	"strings"
+	"wechatBot/General"
+
 	"github.com/blinkbean/dingtalk"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
 /*
 	DingMessage("string",message.Talker().ID())
 */
-func DingMessage(messages, UserID string) {
+func DingMessageSend(messages, UserID string) {
 	if NightMode(UserID) {
-		cli := dingtalk.InitDingTalk([]string{viper.GetString("Ding.TOKEN")}, viper.GetString("Ding.KEYWORD"))
-		if err := cli.SendMarkDownMessage("", messages); err != nil {
+		cli := dingtalk.InitDingTalkWithSecret(viper.GetString("Ding.TOKEN"), viper.GetString("Ding.SECRET"))
+		if err := cli.SendMarkDownMessage(messages, messages); err != nil {
 			log.Errorf("DingMessage Error: %v", err)
 			return
 		}
-
+		log.Println("DingTalk 通知成功! Copyright: ", Copyright(make([]uintptr, 1)))
 	} else {
 		log.Println("现在处于夜间模式，请在白天使用")
 		return
@@ -44,4 +49,26 @@ func DingMessage(messages, UserID string) {
 	// 		}
 	// 	}(resp.Body)
 	// }
+}
+
+func DingMessage(message *user.Message) {
+	if message.Room() != nil {
+		if message.MentionSelf() {
+			if strings.EqualFold(message.Text(), "所有人") {
+				return
+			}
+		} else {
+			return
+		}
+	}
+	msg := fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]\n\n---\n\n**内容**: [%v]", General.Messages.UserName, General.Messages.UserName, General.Messages.UserID, General.Messages.RoomName, General.Messages.RoomID, General.Messages.Content)
+	if General.Messages.PassStatus {
+		msg += fmt.Sprintf("\n\n**Pass**: [%v]", General.Messages.Pass)
+	} else if General.Messages.ReplyStatus {
+		msg += fmt.Sprintf("\n\n**回复**: [%v]", General.Messages.Reply)
+	} else {
+		//
+	}
+	// 到这里的时候基本设置好了一些默认的值了
+	DingMessageSend(msg, General.Messages.UserID)
 }

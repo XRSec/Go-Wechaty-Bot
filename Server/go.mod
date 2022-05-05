@@ -3,13 +3,14 @@ module wechatBot
 go 1.18
 
 require (
-	github.com/beevik/etree v1.1.0
 	github.com/mdp/qrterminal/v3 v3.0.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0
 	github.com/wechaty/go-wechaty v0.4.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
+
+require github.com/beevik/etree v1.1.0
 
 require (
 	github.com/blinkbean/dingtalk v0.0.0-20210905093040-7d935c0f7e19

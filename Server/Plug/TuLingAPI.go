@@ -2,12 +2,13 @@ package Plug
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 /*
@@ -47,7 +48,7 @@ func Tuling(msg string) string {
 	// 判断响应码
 	// TODO 添加自动更换TOKEN
 	if tulingBotResult.Code != 100000 {
-		if strings.Contains(tulingBotResult.Text, "当天请求次数已用完") {
+		if strings.EqualFold(tulingBotResult.Text, "当天请求次数已用完") {
 			if token2 := viper.GetString("tuling.token2"); token2 != "" {
 				viper.Set("tuling.token2", viper.GetString("tuling.token"))
 				viper.Set("tuling.token", token2)

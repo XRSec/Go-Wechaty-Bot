@@ -33,7 +33,7 @@ func NightMode(userID string) bool {
 	timeEnd, _ := time.ParseInLocation(layout, format+" "+endTimeStr, time.Local)
 	//使用time的Before和After方法，判断当前时间是否在参数的时间范围
 	if userID == viper.GetString("bot.adminid") {
-		log.Println("[NightMode] 管理员")
+		log.Println("[NightMode] 管理员 Copyright:", Copyright(make([]uintptr, 1)))
 		return true
 	} else {
 		return !(now.Before(timeEnd) && now.After(timeStart))
@@ -46,10 +46,10 @@ func NightMode(userID string) bool {
 	SayMessage(message, "")
 	请确保你设置过了 ChatTimeLimit函数
 */
-func SayMessage(message *user.Message, msg string) string {
+func SayMessage(message *user.Message, msg string) {
 	log.Printf("消息来自函数: [%v]", Copyright(make([]uintptr, 1)))
 	if !NightMode(message.Talker().ID()) { // 夜间模式
-		return "当前处于夜间模式!"
+		return
 	}
 	if msg == "" {
 		msg = "你想和我说什么呢?"
@@ -64,9 +64,7 @@ func SayMessage(message *user.Message, msg string) string {
 	log.Errorf("SayMessage Error: [%v]", err)
 	General.Messages.Reply = msg
 	General.Messages.ReplyStatus = true
-	General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
 	viper.Set(fmt.Sprintf("Chat.%v.Date", message.Talker().ID()), General.Messages.Date)
-	return msg
 }
 
 /*
