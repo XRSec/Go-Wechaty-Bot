@@ -10,19 +10,18 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
-/*
-	AutoReply()
-	自动回复
-*/
-func AutoReply(message *user.Message) {
+func GroupPass(message *user.Message) {
+	// MessageTypeText
 	if message.Type() != schemas.MessageTypeText {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
+	// self
 	if message.Self() {
 		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
 	}
+	// TIMEOUT
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
@@ -47,20 +46,9 @@ func AutoReply(message *user.Message) {
 		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
-	// Processing message content
-	var msg string
-	if message.MentionText() == "" {
-		msg = "你想和我说什么呢?"
+	if strings.EqualFold(message.Room().Topic(), "nft") {
+		log.Printf("NFT Pass, [%v]", message.Talker().Name())
+		General.Messages.Pass = "NFT"
+		General.Messages.PassStatus = true
 	}
-	if msg = WXAPI(message); msg != "" {
-		goto labelSay
-	}
-	if msg = Tuling(message.MentionText()); msg == "" {
-		msg = "你想和我说什么呢?"
-	}
-labelSay:
-	SayMessage(message, msg)
-	//General.Messages.ReplyStatus = true
-	//General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"
-	//viper.Set(fmt.Sprintf("Chat.%v.Date", message.Talker().ID()), General.Messages.Date)
 }
