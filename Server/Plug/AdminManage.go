@@ -24,7 +24,7 @@ func AdminManage(message *user.Message) {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
-	// self
+	// Self
 	if message.Self() {
 		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
@@ -40,7 +40,7 @@ func AdminManage(message *user.Message) {
 		return
 	}
 	// All Members Pass
-	if message.MentionSelf() && strings.EqualFold(message.Text(), "所有人") {
+	if message.MentionSelf() && strings.Contains(message.Text(), "所有人") {
 		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}
@@ -56,7 +56,7 @@ func AdminManage(message *user.Message) {
 	}
 	// Admin
 	if message.Talker().ID() != viper.GetString("bot.adminid") { // 以下功能仅对管理员开放
-		log.Printf("%v is not admin", message.Talker().ID())
+		log.Printf("Admin Pass: [%v]", message.Talker().ID())
 		return
 	}
 	if message.MentionText() == "add" { // 添加好友
@@ -111,7 +111,7 @@ func AdminManage(message *user.Message) {
 		log.Printf("退出群聊成功! 群聊名称: [%v]", message.Room().Topic())
 		return
 	}
-	if strings.EqualFold(message.MentionText(), "gmz") {
+	if strings.Contains(message.MentionText(), "gmz") {
 		var (
 			newName = strings.Replace(message.MentionText(), "gmz ", "", 1)
 		)

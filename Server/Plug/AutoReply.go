@@ -15,14 +15,17 @@ import (
 	自动回复
 */
 func AutoReply(message *user.Message) {
+	// MessageTypeText
 	if message.Type() != schemas.MessageTypeText {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
+	// Self
 	if message.Self() {
 		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
 	}
+	// TIMEOUT
 	if message.Age() > 2*60*time.Second {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
@@ -33,7 +36,7 @@ func AutoReply(message *user.Message) {
 		return
 	}
 	// All Members Pass
-	if message.MentionSelf() && strings.EqualFold(message.Text(), "所有人") {
+	if message.MentionSelf() && strings.Contains(message.Text(), "所有人") {
 		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}

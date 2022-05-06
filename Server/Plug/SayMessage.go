@@ -60,8 +60,9 @@ func SayMessage(message *user.Message, msg string) {
 	//	return
 	//}
 
-	_, err = message.Say(msg)
-	log.Errorf("SayMessage Error: [%v]", err)
+	if _, err = message.Say(msg); err != nil {
+		log.Errorf("SayMessage Error: [%v]", err)
+	}
 	General.Messages.Reply = msg
 	General.Messages.ReplyStatus = true
 	viper.Set(fmt.Sprintf("Chat.%v.Date", message.Talker().ID()), General.Messages.Date)

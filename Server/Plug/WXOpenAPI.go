@@ -70,7 +70,7 @@ func WXAPI(message *user.Message) string {
 		log.Printf("[wx] 解析 signature 信息失败! Error: %+v", wxSession.Errmsg)
 		return ""
 	}
-	log.Printf("[wx] 解析 signature 信息成功!")
+	log.Printf("[wx] 解析 signature 信息成功! Copyright: %v", Copyright(make([]uintptr, 1)))
 	if resp, err = http.Post(viper.GetString("WXopenai.url")+
 		viper.GetString("WXopenai.TOKEN"),
 		"application/json", strings.NewReader(

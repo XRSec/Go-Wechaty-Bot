@@ -16,7 +16,7 @@ func GroupPass(message *user.Message) {
 		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
 		return
 	}
-	// self
+	// Self
 	if message.Self() {
 		log.Printf("Self Pass, [%v]", message.Talker().Name())
 		return
@@ -32,7 +32,7 @@ func GroupPass(message *user.Message) {
 		return
 	}
 	// All Members Pass
-	if message.MentionSelf() && strings.EqualFold(message.Text(), "所有人") {
+	if message.MentionSelf() && strings.Contains(message.Text(), "所有人") {
 		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}
@@ -46,9 +46,12 @@ func GroupPass(message *user.Message) {
 		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
-	if strings.EqualFold(message.Room().Topic(), "nft") {
+	if strings.Contains(message.Room().Topic(), "nft") || strings.Contains(message.Room().Topic(), "NFT") {
 		log.Printf("NFT Pass, [%v]", message.Talker().Name())
 		General.Messages.Pass = "NFT"
 		General.Messages.PassStatus = true
+		return
+	} else {
+		log.Printf("未触发此操作!")
 	}
 }

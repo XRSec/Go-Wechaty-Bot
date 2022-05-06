@@ -44,7 +44,7 @@ func Manage(message *user.Message) {
 		return
 	}
 	// All Members Pass
-	if message.MentionSelf() && strings.EqualFold(message.Text(), "所有人") {
+	if message.MentionSelf() && strings.Contains(message.Text(), "所有人") {
 		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}
@@ -58,15 +58,15 @@ func Manage(message *user.Message) {
 		log.Printf("ReplyStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
-	if strings.EqualFold(message.MentionText(), "djs") {
+	if strings.Contains(message.MentionText(), "djs") {
 		log.Printf("添加定时提醒成功! 任务详情: %v", "暂无")
 		reply = "添加定时提醒成功! 任务详情: 暂无"
 	}
-	if strings.EqualFold(message.MentionText(), "fdj") {
+	if strings.Contains(message.MentionText(), "fdj") {
 		log.Printf("复读机模式, 复读内容: [%v]", message.MentionText())
 		reply = strings.Replace(message.MentionText(), "fdj ", "", 1)
 	}
-	if strings.EqualFold(message.MentionText(), "print") {
+	if strings.Contains(message.MentionText(), "print") {
 		reply = strings.Replace(message.MentionText(), "print", "", 1)
 	}
 	if message.Room() == nil {
@@ -77,9 +77,9 @@ func Manage(message *user.Message) {
 			}
 			reply = "现有如下交流群, 请问需要加入哪个呢? 请发交流群名字!\n" + keys
 		}
-		if strings.EqualFold(fmt.Sprintf("%v", viper.GetStringMap("Group")), message.Text()) {
+		if strings.Contains(fmt.Sprintf("%v", viper.GetStringMap("Group")), message.Text()) {
 			for i, v := range viper.GetStringMap("Group") {
-				if strings.EqualFold(message.Text(), i) && v != "" {
+				if strings.Contains(message.Text(), i) && v != "" {
 					//	邀请好友进群
 					if err = message.GetWechaty().Room().Load(v.(string)).Add(message.Talker()); err != nil {
 						log.Errorf("邀请好友进群失败, Error: [%v]", err)
