@@ -27,13 +27,17 @@ func GroupPass(message *user.Message) {
 		return
 	}
 	// If there is no @me in the group chat, I will not reply
-	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
+	if message.Room() == nil {
 		log.Printf("Room Pass, [%v]", message.Talker().Name())
 		return
 	}
+	if !message.MentionSelf() {
+		log.Printf("MentionSelf Pass, [%v]", message.Talker().Name())
+		return
+	}
 	// All Members Pass
-	if message.MentionSelf() && strings.Contains(message.Text(), "所有人") {
-		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
+	if strings.Contains(message.Text(), "所有人") {
+		log.Printf("MentionSelf All Pass, [%v]", message.Talker().Name())
 		return
 	}
 	// PassStatus

@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -29,11 +30,11 @@ func WXAPI(message *user.Message) string {
 			Errmsg    string `json:"errmsg"`
 		}
 		Answer struct {
-			AnsNodeName string `json:"ans_node_name"`
-			Answer      string `json:"answer"`
-			//Query       string  `json:"query"`
-			Errcode int    `json:"errcode"`
-			Errmsg  string `json:"errmsg"`
+			AnsNodeName string  `json:"ans_node_name"`
+			Answer      string  `json:"answer"`
+			Confidence  float64 `json:"confidence"`
+			Errcode     int     `json:"errcode"`
+			Errmsg      string  `json:"errmsg"`
 		}
 	)
 	var (
@@ -54,8 +55,7 @@ func WXAPI(message *user.Message) string {
 	}
 	// 关闭鉴权请求
 	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
+		if err = Body.Close(); err != nil {
 			log.Errorf(err.Error())
 		}
 	}(resp.Body)
@@ -74,14 +74,14 @@ func WXAPI(message *user.Message) string {
 	if resp, err = http.Post(viper.GetString("WXopenai.url")+
 		viper.GetString("WXopenai.TOKEN"),
 		"application/json", strings.NewReader(
-			fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, message.MentionText(), viper.GetString("WXopenai.ENV")))); err != nil {
+			// fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, message.MentionText(), viper.GetString("WXopenai.ENV")))); err != nil {
+			fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, url.QueryEscape(message.MentionText()), viper.GetString("WXopenai.ENV")))); err != nil {
 		log.Errorf("[wx] 请求 aibot 接口失败! Error: [%v]:", err)
 		return ""
 	}
 	// 关闭请求
 	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
+		if err = Body.Close(); err != nil {
 			log.Errorf(err.Error())
 		}
 	}(resp.Body)
@@ -97,10 +97,10 @@ func WXAPI(message *user.Message) string {
 		return ""
 	}
 	log.Printf("[wx] 解析 aibot 信息成功!")
+	log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
 	if answer.Answer == "" {
 		log.Println("[wx] 机器人 回复信息为空")
 		return ""
 	}
-	//log.Printf("[wx] AnsNodeName: [%v], Answer: [%v], Errcode: [%v], Errmsg: [%v]", answer.AnsNodeName, answer.Answer, answer.Errcode, answer.Errmsg)
 	return answer.Answer
 }

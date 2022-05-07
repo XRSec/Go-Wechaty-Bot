@@ -84,7 +84,11 @@ func DingMessage(message *user.Message) {
 		log.Printf("PassStatus Pass, [%v]", message.Talker().Name())
 		return
 	}
-	msg := fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]\n\n---\n\n**内容**: [%v]", General.Messages.UserName, General.Messages.UserName, General.Messages.UserID, General.Messages.RoomName, General.Messages.RoomID, General.Messages.Content)
+	msg := fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]", General.Messages.UserName, General.Messages.UserName, General.Messages.UserID)
+	if General.Messages.Status {
+		msg += fmt.Sprintf("\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]", General.Messages.RoomName, General.Messages.RoomID)
+	}
+	msg += fmt.Sprintf("\n\n---\n\n**内容**: [%v]", General.Messages.Content)
 	if General.Messages.PassStatus {
 		msg += fmt.Sprintf("\n\n**Pass**: [%v]", General.Messages.Pass)
 	} else if General.Messages.ReplyStatus {

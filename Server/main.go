@@ -211,8 +211,8 @@ func onMessage(context *Context, message *user.Message) {
 	Plug.Manage(message)
 	Plug.AutoReply(message)
 	Plug.FileBox(message)
-	Plug.DingMessage(message)
-	go General.ExportMessages()
+	// Plug.DingMessage(message)
+	General.ExportMessages()
 }
 
 func main() {

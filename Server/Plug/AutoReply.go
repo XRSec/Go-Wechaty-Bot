@@ -30,6 +30,7 @@ func AutoReply(message *user.Message) {
 		log.Println("消息已丢弃，因为它太旧（超过2分钟）")
 		return
 	}
+
 	// If there is no @me in the group chat, I will not reply
 	if message.Room() != nil && !message.MentionSelf() { // 不允许私聊使用
 		log.Printf("Room Pass, [%v]", message.Talker().Name())
@@ -40,6 +41,13 @@ func AutoReply(message *user.Message) {
 		log.Printf("Mention Self All Members Pass, [%v]", message.Talker().Name())
 		return
 	}
+
+	// if message.Room() == nil {
+	// 	return
+	// }
+	// if !strings.Contains(message.Room().Topic(), "Debug") {
+	// 	return
+	// }
 	// PassStatus
 	if General.Messages.PassStatus {
 		log.Printf("PassStatus Pass, [%v]", message.Talker().Name())
@@ -53,15 +61,19 @@ func AutoReply(message *user.Message) {
 	// Processing message content
 	var msg string
 	if message.MentionText() == "" {
-		msg = "你想和我说什么呢?"
+		msg = "你想表达什么[破涕为笑]?"
 	}
 	if msg = WXAPI(message); msg != "" {
 		goto labelSay
 	}
+	if msg = Qingyunke(message.MentionText()); msg != "" {
+		goto labelSay
+	}
 	if msg = Tuling(message.MentionText()); msg == "" {
-		msg = "你想和我说什么呢?"
+		msg = "我又不会了?"
 	}
 labelSay:
+	// time.Sleep(5 * time.Second)
 	SayMessage(message, msg)
 	//General.Messages.ReplyStatus = true
 	//General.Messages.AutoInfo = General.Messages.AutoInfo + "[" + General.Messages.Reply + "]"

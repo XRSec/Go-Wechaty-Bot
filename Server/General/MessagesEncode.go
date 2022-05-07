@@ -75,7 +75,7 @@ func EncodeMessage(message *user.Message) {
 		Messages.Status = true
 		Messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", Messages.RoomID, Messages.RoomName, Messages.AutoInfo)
 	}
-	ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", Messages.UserID)))
+	// ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", Messages.UserID)))
 }
 
 /*

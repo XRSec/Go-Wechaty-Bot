@@ -56,9 +56,9 @@ func Tuling(msg string) string {
 			}
 		}
 		if tulingBotResult.Text != "你想和我说什么呢?" {
-			log.Errorf("[图灵] 机器人返回错误: [%v]", tulingBotResult.Text)
 			return ""
 		}
+		log.Errorf("[图灵] 机器人返回错误: [%v]", tulingBotResult.Text)
 	}
 	// 输出结果
 	log.Printf("[图灵] 机器人 回复信息: %+v", tulingBotResult.Text)
