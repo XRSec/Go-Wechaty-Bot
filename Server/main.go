@@ -2,13 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-	"wechatBot/General"
-	"wechatBot/Plug"
-
 	"github.com/mdp/qrterminal/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -17,6 +10,13 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+	"wechatBot/General"
+	"wechatBot/Plug"
+	"wechatBot/Plug2"
 )
 
 var (
@@ -245,7 +245,9 @@ func main() {
 			OnRoomLeave(onRoomleave).
 			OnFriendship(onFriendship).
 			//OnHeartbeat(onHeartbeat).
-			OnError(onError)
+			OnError(onError).
+			Use(AutoReply.New())
+		NewPlugin()
 		//bot.DaemonStart()
 
 		if err = bot.Start(); err != nil {
