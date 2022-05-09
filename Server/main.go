@@ -44,9 +44,9 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 		Plug.DingMessageSend(messages, viper.GetString("bot.adminid"))
 		time.Sleep(120 * time.Second)
 	} else if status.String() == "ScanStatusScanned" {
-		log.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
 	} else {
-		log.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
 	}
 }
 
@@ -211,7 +211,7 @@ func onMessage(context *Context, message *user.Message) {
 	Plug.Manage(message)
 	Plug.AutoReply(message)
 	Plug.FileBox(message)
-	// Plug.DingMessage(message)
+	Plug.DingMessage(message)
 	General.ExportMessages()
 }
 

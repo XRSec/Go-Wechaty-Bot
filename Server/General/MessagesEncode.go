@@ -50,6 +50,12 @@ func EncodeMessage(message *user.Message) {
 		Messages.PassStatus = true
 		return
 	}
+	if message.Talker().Type().String() == "ContactTypeOfficial" {
+		log.Printf("Official Pass, [%v]", message.Talker().Name())
+		Messages.Pass = "Official"
+		Messages.PassStatus = true
+		return
+	}
 	if message.Type() != schemas.MessageTypeText {
 		Messages.Content = "[未知消息类型: " + message.Type().String() + "] " + message.MentionText()
 	} else {
@@ -75,7 +81,7 @@ func EncodeMessage(message *user.Message) {
 		Messages.Status = true
 		Messages.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", Messages.RoomID, Messages.RoomName, Messages.AutoInfo)
 	}
-	// ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", Messages.UserID)))
+	ChatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", Messages.UserID)))
 }
 
 /*

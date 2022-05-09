@@ -51,9 +51,11 @@ func SayMessage(message *user.Message, msg string) {
 	if !NightMode(message.Talker().ID()) { // 夜间模式
 		return
 	}
+
 	if msg == "" {
 		msg = "你想和我说什么呢?"
 	}
+
 	// TODO 0.79 私聊有问题
 	//if _, err = message.Say(msg); err != nil {
 	//	log.Errorf("[SayMessage] [%v], error: %v", msg, err)

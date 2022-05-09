@@ -91,13 +91,15 @@ func WXAPI(message *user.Message) string {
 		log.Errorf("[wx] 读取 aibot 信息失败! Error: [%v]:", err)
 		return ""
 	}
+
 	// 解析信息
 	if err = json.Unmarshal(body, &answer); answer.Errcode != 0 {
 		log.Errorf("[wx] 解析 aibot 信息失败! Error: %v", answer.Errmsg)
 		return ""
 	}
+
 	log.Printf("[wx] 解析 aibot 信息成功!")
-	log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
+	// log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
 	if answer.Answer == "" {
 		log.Println("[wx] 机器人 回复信息为空")
 		return ""
