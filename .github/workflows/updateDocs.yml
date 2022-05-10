@@ -18,7 +18,7 @@ jobs:
         id: getdocs
         run: |
           set -ex
-          curl -u "XRSec:${{ secrets.TOKEN_GITHUB }}" -sL "https://api.github.com/repos/XRSec/${{ secrets.BETAREPO }}/zipball" -o tmp.zip || exit
+          curl -sLH "Authorization: token ${{ SECRETS.TOKEN_GITHUB }}" "https://api.github.com/repos/XRSec/${{ secrets.BETAREPO }}/zipball" -o tmp.zip || exit
           unzip tmp.zip || exit
           find * | grep -vE "Server|XRSec" | xargs rm -rf || exit
           rm -rf XRSec*/Server || exit
