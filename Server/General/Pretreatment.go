@@ -2,39 +2,22 @@ package General
 
 import (
 	"fmt"
-	"github.com/blinkbean/dingtalk"
+	"path"
+	"runtime"
+	"strings"
+	"time"
+	. "wechatBot/Plug"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"path"
-	"runtime"
-	"strings"
-	"time"
 )
 
 //var (
 //	err error
 //)
-
-type (
-	MessageInfo struct {
-		Date        string `json:"data"`         // 时间
-		Status      bool   `json:"status"`       // 群聊属性
-		AtMe        bool   `json:"atme"`         // 是否@我
-		RoomName    string `json:"room_name"`    // 群聊名称
-		RoomID      string `json:"room_id"`      // 群聊ID
-		UserName    string `json:"user_name"`    // 用户名称
-		UserID      string `json:"userid"`       // 用户ID
-		Content     string `json:"content"`      // 聊天内容
-		AutoInfo    string `json:"auto_info"`    // 信息一览
-		ReplyResult string `json:"reply_result"` // 自动回复
-		Reply       bool   `json:"reply"`        // 自动回复状态
-		PassResult  string `json:"pass_result"`  // pass 原因
-		Pass        bool   `json:"pass"`         // pass 状态
-	}
-)
 
 func Pretreatment() *wechaty.Plugin {
 	plug := wechaty.NewPlugin()
@@ -42,7 +25,7 @@ func Pretreatment() *wechaty.Plugin {
 	return plug
 }
 
-func encodeMessage(context *wechaty.Context, message *user.Message) {
+func onMessage(context *wechaty.Context, message *user.Message) {
 	var m MessageInfo
 	m.UserName = message.Talker().Name()
 	m.UserID = message.Talker().ID()
@@ -53,19 +36,19 @@ func encodeMessage(context *wechaty.Context, message *user.Message) {
 	m.AtMe = false
 	// 公众号消息
 	if message.Type() == schemas.MessageTypeRecalled {
-		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "MessageTypeRecalled"
 		m.Pass = true
 		return
 	}
 	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
-		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "微信团队"
 		m.Pass = true
 		return
 	}
 	if message.Talker().Type().String() == "ContactTypeOfficial" {
-		log.Printf("Official Pass, [%v]", message.Talker().Name())
+		log.Errorf("Official Pass, [%v] CoptRight: [%s]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "Official"
 		m.Pass = true
 		return
@@ -74,10 +57,10 @@ func encodeMessage(context *wechaty.Context, message *user.Message) {
 		if strings.Contains(message.Text(), "所有人") {
 			m.PassResult = "所有人"
 			m.Pass = true
+			log.Errorf("At All Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 			return
 		}
 		m.AtMe = true
-		fmt.Println("set atme ", m.AtMe)
 	}
 	if message.Type() != schemas.MessageTypeText {
 		m.Content = "[未知消息类型: " + message.Type().String() + "] " + message.Text()
@@ -92,14 +75,9 @@ func encodeMessage(context *wechaty.Context, message *user.Message) {
 		m.Status = true
 		m.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", m.RoomID, m.RoomName, m.AutoInfo)
 	}
-
-	chatTimeLimit(m)
+	context.SetData("msgInfo", m)
+	chatTimeLimit(context, message)
 	//chatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", m.UserID)))
-	context.SetData("msgInfo", &m)
-}
-
-func onMessage(context *wechaty.Context, message *user.Message) {
-	encodeMessage(context, message)
 }
 
 /*
@@ -107,7 +85,12 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		: 判断消息是否在规定时间内
 		: 如果是，则返回true，否则返回false
 */
-func chatTimeLimit(m MessageInfo) {
+func chatTimeLimit(context *wechaty.Context, message *user.Message) {
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
+	if !ok {
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
+	}
 	//当前时间
 	var (
 		now      time.Time
@@ -115,37 +98,35 @@ func chatTimeLimit(m MessageInfo) {
 		lastDate time.Time
 		date     = viper.GetString(fmt.Sprintf("Chat.%v.Date", m.UserID))
 	)
-
 	if date == "" {
+		log.Errorf("Not Set Date, CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
-
-	//if m.Status && !m.AtMe {
-	//	log.Infof("Room !Atme [%v]", m.UserName)
-	//	return
-	//}
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
 	if loc, err = time.LoadLocation("Local"); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Loc: [%v]", err, loc)
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Loc: [%v] CoptRight: [%s]", err, loc, Copyright(make([]uintptr, 1)))
 		// [ChatTimeLimit] time.ParseInLocation, Error: [The system cannot find the path specified.], Loc: [UTC]
 		return
 	}
 	if now, err = time.ParseInLocation("2006-01-02 15:04:05", timeNow, loc); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Now: [%v]", err, now)
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Now: [%v] CoptRight: [%s]", err, now, Copyright(make([]uintptr, 1)))
 		return
 	}
 	//当前时间转换为"年-月-日"的格式
 	if lastDate, err = time.ParseInLocation("2006-01-02 15:04:05", date, loc); err != nil {
-		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Lastdate: [%v]", err, lastDate)
+		log.Errorf("[ChatTimeLimit] time.ParseInLocation, Error: [%v], Lastdate: [%v] CoptRight: [%s]", err, lastDate, Copyright(make([]uintptr, 1)))
 		return
 	}
 	//计算两个时间相差的秒数
 	if second := int(now.Sub(lastDate).Seconds()); second < 30 {
-		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
+		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d] CoptRight: [%s]", lastDate, now, second, Copyright(make([]uintptr, 1)))
 		// Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
 		m.PassResult = "ChatTimeLimit"
 		m.Pass = true
+		context.SetData("msgInfo", m)
 		return
+	} else {
+		log.Error("[ChatTimeLimit] 时间相差超过 30 秒")
 	}
 }
 
@@ -156,11 +137,11 @@ func chatTimeLimit(m MessageInfo) {
 	请确保你设置过了 ChatTimeLimit函数
 */
 func SayMessage(context *wechaty.Context, message *user.Message, msg string) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
-	log.Printf("消息来自函数: [%v]", Copyright(make([]uintptr, 1)))
 	if !NightMode(m.UserID) { // 夜间模式
 		return
 	}
@@ -178,77 +159,18 @@ func SayMessage(context *wechaty.Context, message *user.Message, msg string) {
 
 	// TODO 0.79 私聊有问题
 	//if _, err = message.Say(msg); err != nil {
-	//	log.Errorf("[SayMessage] [%v], error: %v", msg, err)
+	//	log.Errorf("[SayMessage] [%v], error: %v CoptRight: [%s]", msg, err, Copyright(make([]uintptr, 1)))
 	//	return
 	//}
 
 	if _, err = message.Say(msg); err != nil {
-		log.Errorf("SayMessage Error: [%v]", err)
+		log.Errorf("SayMessage Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 	}
 	m.ReplyResult = msg
 	m.Reply = true
 	//m.AutoInfo += fmt.Sprintf(" 回复: [%v]", msg)
-	context.SetData("msgInfo", &m)
+	context.SetData("msgInfo", m)
 	viper.Set(fmt.Sprintf("Chat.%v.Date", m.UserID), m.Date)
-}
-
-func DingSend(context *wechaty.Context, message *user.Message, msg string) {
-	if NightMode(message.Talker().ID()) {
-		cli := dingtalk.InitDingTalkWithSecret(viper.GetString("Ding.TOKEN"), viper.GetString("Ding.SECRET"))
-		if err := cli.SendMarkDownMessage(msg, msg); err != nil {
-			log.Errorf("DingMessage Error: %v", err)
-			return
-		}
-		log.Println("DingTalk 通知成功! Copyright: ", Copyright(make([]uintptr, 1)))
-	} else {
-		log.Println("现在处于夜间模式，请在白天使用")
-		return
-	}
-}
-
-func DingMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
-	if !ok {
-		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
-	}
-	if m.Pass {
-		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
-		return
-	}
-	//if m.Reply {
-	//	log.Errorf("Reply CoptRight: [%s]", Copyright(make([]uintptr, 1)))
-	//	return
-	//}
-	if !m.AtMe {
-		log.Errorf("AtMe CoptRight: [%s]", Copyright(make([]uintptr, 1)))
-		return
-	}
-	if message.Type() != schemas.MessageTypeText {
-		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
-		return
-	}
-	if message.Self() {
-		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
-		return
-	}
-	if message.Age() > 2*60*time.Second {
-		log.Errorf("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
-		return
-	}
-	msg := fmt.Sprintf("%v@我了\n\n---\n\n### 用户属性\n\n用户名: [%v]\n\n用户ID: [%v]", message.Talker().Name(), message.Talker().Name(), message.Talker().ID())
-	if message.Room() != nil {
-		msg += fmt.Sprintf("\n\n---\n\n### 群聊属性\n\n群聊名称: [%v]\n\n群聊ID: [%v]", message.Room().Topic(), message.Room().ID())
-	}
-	msg += fmt.Sprintf("\n\n---\n\n**内容**: [%v]", message.Text())
-	if m.Pass {
-		msg += fmt.Sprintf("\n\n**Pass**: [%v]", m.PassResult)
-	} else if m.Reply {
-		msg += fmt.Sprintf("\n\n**回复**: [%v]", m.ReplyResult)
-	} else {
-		//
-	}
-	// 到这里的时候基本设置好了一些默认的值了
-	DingSend(context, message, msg)
 }
 
 /*
@@ -270,8 +192,8 @@ func NightMode(userID string) bool {
 	//将结束时间拼接“年-月-日 ”转换为time类型
 	timeEnd, _ := time.ParseInLocation(layout, format+" "+endTimeStr, time.Local)
 	//使用time的Before和After方法，判断当前时间是否在参数的时间范围
-	if userID == viper.GetString("bot.adminid") {
-		log.Println("[NightMode] 管理员 Copyright:", Copyright(make([]uintptr, 1)))
+	if userID == viper.GetString("Bot.AdminId") {
+		log.Infof("[NightMode] 管理员 Copyright: [%s]", Copyright(make([]uintptr, 1)))
 		return true
 	} else {
 		return !(now.Before(timeEnd) && now.After(timeStart))

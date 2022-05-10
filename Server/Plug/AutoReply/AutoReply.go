@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 	. "wechatBot/General"
+	. "wechatBot/Plug"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -25,9 +26,10 @@ func AutoReply() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion Failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
 	if m.Pass {
 		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
@@ -46,7 +48,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if message.Self() {
-		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Errorf("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Age() > 2*60*time.Second {
@@ -119,7 +121,7 @@ func wxApi(message *user.Message) string {
 	// 关闭鉴权请求
 	defer func(Body io.ReadCloser) {
 		if err = Body.Close(); err != nil {
-			log.Errorf(err.Error())
+			log.Errorf("Error: [%v] CoptRight: [%s]", err.Error(), Copyright(make([]uintptr, 1)))
 		}
 	}(resp.Body)
 
@@ -145,7 +147,7 @@ func wxApi(message *user.Message) string {
 	// 关闭请求
 	defer func(Body io.ReadCloser) {
 		if err = Body.Close(); err != nil {
-			log.Errorf(err.Error())
+			log.Errorf("Error: [%v] CoptRight: [%s]", err.Error(), Copyright(make([]uintptr, 1)))
 		}
 	}(resp.Body)
 
@@ -164,7 +166,7 @@ func wxApi(message *user.Message) string {
 	log.Infof("[wx] 解析 aibot 信息成功!")
 	// log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
 	if answer.Answer == "" {
-		log.Errorf("[wx] 机器人 回复信息为空")
+		log.Errorf("[wx] 机器人 回复信息为空 CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return ""
 	}
 	return answer.Answer
@@ -221,7 +223,7 @@ func tuLingApi(msg string) string {
 		err  error
 	)
 	// 发送请求
-	tuLingWebhook := viper.GetString("tuLing.URL") + viper.GetString("tuLing.TOKEN")
+	tuLingWebhook := viper.GetString("TuLing.URL") + viper.GetString("TuLing.TOKEN")
 	if resp, err = http.Get(tuLingWebhook + url.QueryEscape(msg)); err != nil {
 		log.Errorf("[图灵] 机器人请求错误: [%v] CoptRight: [%v]", err, Copyright(make([]uintptr, 1)))
 		return ""
@@ -241,9 +243,9 @@ func tuLingApi(msg string) string {
 	// TODO 添加自动更换TOKEN
 	if t.Code != 100000 {
 		if strings.Contains(t.Text, "当天请求次数已用完") {
-			if token2 := viper.GetString("tuLing.token2"); token2 != "" {
-				viper.Set("tuLing.token2", viper.GetString("tuLing.token"))
-				viper.Set("tuLing.token", token2)
+			if token2 := viper.GetString("TuLing.token2"); token2 != "" {
+				viper.Set("TuLing.token2", viper.GetString("TuLing.token"))
+				viper.Set("TuLing.token", token2)
 				return ""
 			}
 		}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 	. "wechatBot/General"
+	. "wechatBot/Plug"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,7 +17,7 @@ import (
 
 var (
 	fp       *os.File
-	filename = viper.GetString("rootPath") + "/data.json"
+	filename = viper.GetString("RootPath") + "/data.json"
 	result   []byte
 	err      error
 )
@@ -32,9 +33,10 @@ func ExportMessage() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion Failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
 	if m.Pass {
 		m.AutoInfo += fmt.Sprintf(" Pass: [%v]", m.PassResult)
@@ -56,28 +58,28 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	}
 
 	if result, err = json.Marshal(m); err != nil {
-		log.Errorf("[ExportMessages] Json 解析失败! Error: [%v]", err)
+		log.Errorf("[ExportMessages] Json 解析失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 		return
 	}
 	if _, err = os.Stat(filename); err != nil {
-		log.Errorf("[ExportMessages] 聊天备份文件不存在,正在创建! Error: [%v]", err)
+		log.Errorf("[ExportMessages] 聊天备份文件不存在,正在创建! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 	}
 	if fp, err = os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755); err != nil {
-		log.Errorf("[ExportMessages] 打开聊天备份文件失败! Error: [%v]", err)
+		log.Errorf("[ExportMessages] 打开聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 	}
 	defer func(fp *os.File) {
 		if err = fp.Close(); err != nil {
-			log.Errorf("[ExportMessages] 关闭聊天备份文件失败! Error: [%v]", err)
+			log.Errorf("[ExportMessages] 关闭聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 		}
 	}(fp)
 	if _, err = fp.Write(result); err != nil {
-		log.Errorf("[ExportMessages] 写入聊天记录到聊天备份文件失败! Error: [%v]", err)
+		log.Errorf("[ExportMessages] 写入聊天记录到聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 		return
 	}
 	if _, err = fp.WriteString("\n"); err != nil {
-		log.Errorf("[ExportMessages] 写入换行符到聊天备份文件失败! Error: [%v]", err)
+		log.Errorf("[ExportMessages] 写入换行符到聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 		return
 	}
-	log.Printf(m.AutoInfo)
-	context.SetData("msgInfo", &m)
+	log.Infof("%s  CoptRight: [%s]", m.AutoInfo, Copyright(make([]uintptr, 1)))
+	context.SetData("msgInfo", m)
 }

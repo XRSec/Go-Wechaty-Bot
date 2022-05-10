@@ -1,17 +1,15 @@
 package Group
 
 import (
+	"strings"
+	"time"
+	. "wechatBot/General"
+	. "wechatBot/Plug"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"strings"
-	"time"
-	. "wechatBot/General"
-)
-
-var (
-	err error
 )
 
 func Group() *wechaty.Plugin {
@@ -21,9 +19,10 @@ func Group() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion Failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
 	if m.Pass {
 		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
@@ -42,7 +41,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if message.Self() {
-		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Errorf("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Age() > 2*60*time.Second {
@@ -56,7 +55,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		log.Printf("NFT Pass, [%v] CoptRight: [%v]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "NFT"
 		m.Pass = true
-		context.SetData("msgInfo", &m)
+		context.SetData("msgInfo", m)
 		return
 	}
 }

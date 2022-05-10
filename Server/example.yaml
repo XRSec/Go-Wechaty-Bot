@@ -1,5 +1,5 @@
 BOT:
-  ADMINID: wxid_xxxxx
+  adminID: wxid_xxxxx
   NAME: xxxxxxxx
 DING:
   SECRET: xxxxxxxxxxxxxxxxxx
@@ -18,4 +18,3 @@ WXOPENAI:
   TOKEN: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 GROUP:
   XXXXX: xxxxx@chatroom
-

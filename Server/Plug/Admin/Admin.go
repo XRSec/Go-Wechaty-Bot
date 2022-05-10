@@ -2,15 +2,17 @@ package Admin
 
 import (
 	"fmt"
+	"strings"
+	"time"
+	. "wechatBot/General"
+	. "wechatBot/Plug"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"strings"
-	"time"
-	. "wechatBot/General"
 )
 
 var (
@@ -28,9 +30,10 @@ func Admin() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion Failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
 	if m.Pass {
 		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
@@ -49,14 +52,14 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if message.Self() {
-		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Errorf("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Age() > 2*60*time.Second {
 		log.Errorf("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
 		return
 	}
-	if m.UserID != viper.GetString("bot.adminid") {
+	if m.UserID != viper.GetString("Bot.AdminID") {
 		log.Errorf("UserID: [%s] CoptRight: [%s]", m.UserID, Copyright(make([]uintptr, 1)))
 		return
 	}
@@ -70,13 +73,13 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		//}
 		//log.Printf("搜索用户名ID成功, 用户名: [%v]", addUser.Name())
 		if message.GetWechaty().Contact().Load(addUser.ID()).Friend() {
-			log.Errorf("用户已经是好友, 用户名: [%v]", addUser.Name())
+			log.Infof("用户已经是好友, 用户名: [%v] CoptRight: [%s]", addUser.Name(), Copyright(make([]uintptr, 1)))
 			SayMessage(context, message, fmt.Sprintf("用户: [%v] 已经是好友了", addUser))
 			return
 		}
 
-		if err = message.GetWechaty().Friendship().Add(member, fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("bot.name"))); err != nil {
-			log.Errorf("添加好友失败, 用户名: [%v], Error: [%v]", addUser, err)
+		if err = message.GetWechaty().Friendship().Add(member, fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("Bot.Name"))); err != nil {
+			log.Errorf("添加好友失败, 用户名: [%v], Error: [%v] CoptRight: [%s]", addUser, err, Copyright(make([]uintptr, 1)))
 			SayMessage(context, message, fmt.Sprintf("添加好友失败, 用户: [%v]", addUser))
 			return
 		}
@@ -90,19 +93,20 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 			delUser = message.MentionList()[0]
 		)
 		if err = message.Room().Del(delUser); err != nil {
-			log.Errorf("从群聊中移除用户失败, 用户名: [%v] Error: [%v]", delUser.Name(), err)
+			log.Errorf("从群聊中移除用户失败, 用户名: [%v] Error: [%v] CoptRight: [%s]", delUser.Name(), err, Copyright(make([]uintptr, 1)))
 			SayMessage(context, message, fmt.Sprintf("从群聊中移除用户失败, 用户: [%v]", delUser.Name()))
 			return
 		}
 		m.PassResult = fmt.Sprintf("从群聊中移除用户: [%v]", delUser.Name())
 		m.Pass = true
+		context.SetData("msgInfo", m)
 		return
 	}
 
 	if message.MentionText() == "quit" { // 退群
 		SayMessage(context, message, "我走了, 拜拜👋🏻, 记得想我哦 [大哭]")
 		if err = message.Room().Quit(); err != nil {
-			log.Errorf("退出群聊失败, 群聊名称: [%v], Error: [%v]", message.Room().Topic(), err)
+			log.Errorf("退出群聊失败, 群聊名称: [%v], Error: [%v] CoptRight: [%s]", message.Room().Topic(), err, Copyright(make([]uintptr, 1)))
 			SayMessage(context, message, fmt.Sprintf("退出群聊失败, 群聊名称: [%v], Error: [%v]", message.Room().Topic(), err))
 			return
 		}
@@ -118,14 +122,15 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		)
 
 		if err = message.GetPuppet().SetContactSelfName(newName); err != nil {
-			log.Errorf("修改用户名失败, Error: [%v]", err)
+			log.Errorf("修改用户名失败, Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 			SayMessage(context, message, fmt.Sprintf("修改用户名失败, Error: [%v]", err))
 			return
 		}
 
-		log.Printf("修改用户名成功! 新的名称: %v", newName)
+		log.Infof("修改用户名成功! 新的名称: %v CoptRight: [%s]", newName, Copyright(make([]uintptr, 1)))
 		m.PassResult = fmt.Sprintf("改名字: [%v]", newName)
 		m.Pass = true
+		context.SetData("msgInfo", m)
 		return
 	}
 }

@@ -1,6 +1,8 @@
 package FileBox
 
 import (
+	. "wechatBot/General"
+
 	"github.com/beevik/etree"
 	log "github.com/sirupsen/logrus"
 	"github.com/wechaty/go-wechaty/wechaty"
@@ -20,11 +22,11 @@ func FileBox() *wechaty.Plugin {
 
 func onMessage(context *wechaty.Context, message *user.Message) {
 	if message.Type() != schemas.MessageTypeUnknown && message.Type() != schemas.MessageTypeAttachment {
-		log.Printf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		log.Printf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Type() == schemas.MessageTypeRecalled {
-		log.Errorf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		return
 	}
 
@@ -47,18 +49,18 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	MessageTypeVideo
 	*/
 	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
-		log.Errorf("Type Pass, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		return
 	}
-	log.Infof("FileBox, Type: [%v]:[%v]", message.Type().String(), message.Talker().Name())
+	log.Infof("FileBox, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 	fileType, fileName := FileType(message)
 	switch fileType {
 	case "pdf":
-		log.Infof("[fileType:%v] [fileName:%v]", fileType, fileName)
+		log.Infof("[fileType:%v] [fileName:%v] CoptRight: [%s]", fileType, fileName, Copyright(make([]uintptr, 1)))
 	case "rar|zip|tar|gz":
-		log.Infof("[fileType:%v] [fileName:%v]", fileType, fileName)
+		log.Infof("[fileType:%v] [fileName:%v] CoptRight: [%s]", fileType, fileName, Copyright(make([]uintptr, 1)))
 	default:
-		log.Infof("[fileType:%v] [fileName:%v]", fileType, fileName)
+		log.Infof("[fileType:%v] [fileName:%v] CoptRight: [%s]", fileType, fileName, Copyright(make([]uintptr, 1)))
 	}
 }
 
@@ -67,7 +69,7 @@ func FileType(message *user.Message) (string, string) {
 	fileName := ""
 	doc := etree.NewDocument()
 	if err = doc.ReadFromString(message.MentionText()); err != nil {
-		log.Errorf("FileType Error: [%v]", err)
+		log.Errorf("FileType Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 	}
 	for _, t := range doc.FindElements("//fileext") {
 		fileType = t.Text()

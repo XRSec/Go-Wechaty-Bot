@@ -2,19 +2,20 @@ package Average
 
 import (
 	"fmt"
+	"strings"
+	"time"
+	. "wechatBot/General"
+	. "wechatBot/Plug"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"strings"
-	"time"
-	. "wechatBot/General"
 )
 
 var (
-	err   error
-	reply string
+	err error
 )
 
 func Average() *wechaty.Plugin {
@@ -24,9 +25,11 @@ func Average() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(*MessageInfo)
+	reply := ""
+	m, ok := (context.GetData("msgInfo")).(MessageInfo)
 	if !ok {
-		log.Errorf("Conversion Failed")
+		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
 	}
 	if m.Pass {
 		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
@@ -54,12 +57,12 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	}
 
 	if strings.Contains(message.MentionText(), "djs") {
-		log.Infof("添加定时提醒成功! 任务详情: %v", "暂无")
+		log.Infof("添加定时提醒成功! 任务详情: %v CoptRight: [%s]", "暂无", Copyright(make([]uintptr, 1)))
 		reply = "添加定时提醒成功! 任务详情: 暂无"
 	}
 
 	if strings.Contains(message.MentionText(), "fdj") {
-		log.Infof("复读机模式, 复读内容: [%v]", message.MentionText())
+		log.Infof("复读机模式, 复读内容: [%v] CoptRight: [%s]", message.MentionText(), Copyright(make([]uintptr, 1)))
 		reply = strings.Replace(message.MentionText(), "fdj ", "", 1)
 	}
 
@@ -80,10 +83,10 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 				if strings.Contains(message.Text(), i) && v != "" {
 					//	邀请好友进群
 					if err = message.GetWechaty().Room().Load(v.(string)).Add(message.Talker()); err != nil {
-						log.Errorf("邀请好友进群失败, Error: [%v]", err)
+						log.Errorf("邀请好友进群失败, Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
 						return
 					}
-					log.Println("邀请好友进群成功!")
+					log.Infof("邀请好友进群成功! CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 					reply = "已经拉你啦! 等待管理员审核通过呀!"
 				}
 			}
