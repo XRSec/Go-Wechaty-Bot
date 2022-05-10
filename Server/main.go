@@ -2,6 +2,20 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+	. "wechatBot/General"
+
+	. "wechatBot/Plug/Admin"
+	. "wechatBot/Plug/AutoReply"
+	. "wechatBot/Plug/Average"
+	. "wechatBot/Plug/DingMessage"
+	. "wechatBot/Plug/ExportMessage"
+	. "wechatBot/Plug/FileBox"
+	. "wechatBot/Plug/Group"
+
 	"github.com/mdp/qrterminal/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -10,18 +24,6 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-	. "wechatBot/General"
-	. "wechatBot/Plug/Admin"
-	. "wechatBot/Plug/AutoReply"
-	. "wechatBot/Plug/Average"
-	. "wechatBot/Plug/DingMessage"
-	. "wechatBot/Plug/ExportMessage"
-	. "wechatBot/Plug/FileBox"
-	. "wechatBot/Plug/Group"
 	//. "wechatBot/Plug/Test"
 )
 
@@ -237,29 +239,31 @@ func main() {
 			Use(ExportMessage()).
 			//OnHeartbeat(onHeartbeat).
 			Use(DingMessage())
-		//bot.DaemonStart()
+			//bot.DaemonStart()
 
-		/*
-			Use(func() *Plugin {
-				plug := NewPlugin()
-				plug.OnMessage(func(context *Context, message *user.Message) {
-					var l1 string
-					if l1 == "" {
-						l1 = message.Talker().ID()
-					} else {
-						l1 = message.Talker().Name()
-					}
-					log.Printf(l1)
-				})
-				return plug
-			}()).
-			Use(func() *Plugin {
-				plug := NewPlugin()
-				plug.OnMessage(func(context *Context, message *user.Message) {
-				})
-				return plug
-			}())
-		*/
+			/*
+				Use(func() *Plugin {
+					plug := NewPlugin()
+					plug.OnMessage(func(context *Context, message *user.Message) {
+						var l1 string
+						if l1 == "" {
+							fmt.Println("空")
+							l1 = "空"
+						} else if l1 == message.Talker().ID() {
+							fmt.Println("上个消息留下来的内容")
+						} else {
+							log.Printf("这是第三种情况%v", l1)
+						}
+					})
+					return plug
+				}()).
+				Use(func() *Plugin {
+					plug := NewPlugin()
+					plug.OnMessage(func(context *Context, message *user.Message) {
+					})
+					return plug
+				}())
+			// */
 
 		if err = bot.Start(); err != nil {
 			// 重启Bot
