@@ -245,15 +245,6 @@ func main() {
 				Use(func() *Plugin {
 					plug := NewPlugin()
 					plug.OnMessage(func(context *Context, message *user.Message) {
-						var l1 string
-						if l1 == "" {
-							fmt.Println("空")
-							l1 = "空"
-						} else if l1 == message.Talker().ID() {
-							fmt.Println("上个消息留下来的内容")
-						} else {
-							log.Printf("这是第三种情况%v", l1)
-						}
 					})
 					return plug
 				}()).
