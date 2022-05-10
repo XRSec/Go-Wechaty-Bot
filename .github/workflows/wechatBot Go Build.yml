@@ -6,13 +6,13 @@ on:
       releaseName:
         description: 'Set release name'
         required: true
-        default: "Use Go & SDK Wechaty & Protocol XP"
+        default: "Use Go & SDK Wechaty"
       tagName:
         description: 'Set tag name'
         required: false
         type: string
-  watch:
-    types: [started]
+  # watch:
+  #   types: [started]
 
 jobs:
   Build:
