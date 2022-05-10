@@ -42,11 +42,11 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 			QuietZone: 1,
 		})
 		fmt.Printf("\n\n")
-		log.Printf("%v[Scan] https://wechaty.js.org/qrcode/%v %v", viper.GetString("info"), qrCode, data)
+		log.Printf("[Scan] https://wechaty.js.org/qrcode/%v %v", qrCode, data)
 	} else if status.String() == "ScanStatusScanned" {
-		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	} else {
-		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	}
 }
 

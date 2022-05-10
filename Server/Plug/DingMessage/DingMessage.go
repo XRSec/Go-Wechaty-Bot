@@ -87,9 +87,9 @@ func onScan(context *wechaty.Context, qrCode string, status schemas.ScanStatus, 
 			}
 		}
 	} else if status.String() == "ScanStatusScanned" {
-		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	} else {
-		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
+		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	}
 }
 
