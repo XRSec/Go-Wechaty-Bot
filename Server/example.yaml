@@ -1,22 +1,25 @@
-bot:
-  adminid: wxid_xxxxx
-  name: xxxxxxxx
-ding:
-  keyword: Wechaty
-  token: xxxxxxxxxxxxxxxxxx
-  url: https://oapi.dingtalk.com/robot/send?access_token=
-tuling:
-  token: xxxxxxxxxxxxxxxx&info=
-  url: http://www.tuling123.com/openapi/api?key=
-wechaty:
-  endpoint: 127.0.0.1:25001
-  token: insecure_xxxxxxxxxxxxxxxxxxxxxx
-  wechaty_puppet_service_no_tls_insecure_client: true
-wxopenai:
-  env: online
-  signUrl: https://openai.weixin.qq.com/openapi/sign/
-  url: https://openai.weixin.qq.com/openapi/aibot/
-  token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-group:
-  xxxxx: xxxxx@chatroom
+BOT:
+  adminID: wxid_xxxxx
+  NAME: xxxxxxxx
+WECHATY:
+  ENDPOINT: 127.0.0.1:25001
+  TOKEN: insecure_xxxxxxxxxxxxxxxxxxxxxx
+  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
+GROUP:
+  XXXXX: xxxxx@chatroom
 
+DING:
+  SECRET: xxxxxxxxxxxxxxxxxx
+  TOKEN: xxxxxxxxxxxxxxxxxx
+WXOPENAI:
+  ENV: online
+  SIGNURL: https://openai.weixin.qq.com/openapi/sign/
+  URL: https://openai.weixin.qq.com/openapi/aibot/
+  TOKEN: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TULING:
+  TOKEN: xxxxxxxxxxxxxxxx&info=
+  URL: http://www.tuling123.com/openapi/api?key=
+QingYunKe:
+  AppID: 0
+  Key: free
+  URL: https://api.qingyunke.com/api.php?key=free&appid=0&msg=

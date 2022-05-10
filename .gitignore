@@ -3,3 +3,7 @@ test
 config.yaml
 tmp
 main.exe
+data.json
+test.sh
+.vscode/settings.json
+logs
