@@ -14,9 +14,13 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"wechatBot/General"
-	"wechatBot/Plug"
-	"wechatBot/Plug2"
+	. "wechatBot/General"
+	. "wechatBot/Plug/Admin"
+	. "wechatBot/Plug/AutoReply"
+	. "wechatBot/Plug/Average"
+	. "wechatBot/Plug/ExportMessage"
+	. "wechatBot/Plug/FileBox"
+	. "wechatBot/Plug/Group"
 )
 
 var (
@@ -40,8 +44,8 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 		})
 		fmt.Printf("\n\n")
 		log.Printf("%v[Scan] https://wechaty.js.org/qrcode/%v %v", viper.GetString("info"), qrCode, data)
-		messages := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
-		Plug.DingMessageSend(messages, viper.GetString("bot.adminid"))
+		//messages := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
+		//Plug.DingMessageSend(messages, viper.GetString("bot.adminid"))
 		time.Sleep(120 * time.Second)
 	} else if status.String() == "ScanStatusScanned" {
 		fmt.Printf("%v[Scan] Status: %v %v\n", viper.GetString("info"), status.String(), data)
@@ -134,9 +138,9 @@ func onRoomJoin(context *Context, room *user.Room, inviteeList []_interface.ICon
 		}
 	}
 	log.Printf("群聊名称: [%v], 新人: [%v], 邀请人: [%v], 时间: [%v]", room.Topic(), newUser, inviter.Name(), date)
-	if !Plug.NightMode(inviter.ID()) {
-		return
-	}
+	//if !Plug.NightMode(inviter.ID()) {
+	//	return
+	//}
 	if _, err = room.Say(fmt.Sprintf("@%v 欢迎新人!", newUser)); err != nil {
 		log.Errorf("[onRoomJoin] 欢迎新人加入群聊消息发送失败, Error: %v", err)
 	} else {
@@ -196,23 +200,11 @@ func onHeartbeat(context *Context, data string) {
 }
 
 func onError(context *Context, err error) {
-	log.Errorf("[onError] Error: [%v] 消息来自函数: [%v]", err, Plug.Copyright(make([]uintptr, 1)))
+	//log.Errorf("[onError] Error: [%v] 消息来自函数: [%v]", err, Plug.Copyright(make([]uintptr, 1)))
 }
 
 func onMessage(context *Context, message *user.Message) {
-	// 编码信息
-	General.EncodeMessage(message) // map 加锁
-	// Debug Model
-	// if message.Talker().ID() != viper.GetString("bot.adminid") {
-	// 	return
-	// }
-	Plug.GroupPass(message)
-	Plug.AdminManage(message)
-	Plug.Manage(message)
-	Plug.AutoReply(message)
-	Plug.FileBox(message)
-	Plug.DingMessage(message)
-	General.ExportMessages()
+	DingMessage(context, message)
 }
 
 func main() {
@@ -226,7 +218,7 @@ func main() {
 	for i <= 10 {
 		i++
 		// 钉钉推送
-		General.WechatBotInit()
+		WechatBotInit()
 		var bot = NewWechaty(WithPuppetOption(puppet.Option{
 			Token:    viper.GetString("wechaty.token"),
 			Endpoint: viper.GetString("wechaty.endpoint"),
@@ -237,8 +229,14 @@ func main() {
 
 		bot.OnScan(onScan).
 			OnLogin(onLogin).
-			OnLogout(onLogout).
+			Use(Pretreatment()).
+			Use(Group()).
+			Use(Admin()).
+			Use(Average()).
+			Use(AutoReply()).
+			Use(FileBox()).
 			OnMessage(onMessage).
+			Use(ExportMessage()).
 			OnRoomInvite(onRoomInvite). // 有问题，暂时不用，等待修复
 			OnRoomTopic(onRoomTopic).
 			OnRoomJoin(onRoomJoin).
@@ -246,8 +244,7 @@ func main() {
 			OnFriendship(onFriendship).
 			//OnHeartbeat(onHeartbeat).
 			OnError(onError).
-			Use(AutoReply.New())
-		NewPlugin()
+			OnLogout(onLogout)
 		//bot.DaemonStart()
 
 		if err = bot.Start(); err != nil {
@@ -265,7 +262,7 @@ func main() {
 			signal.Notify(quitSig, os.Interrupt, os.Kill, syscall.SIGINT, syscall.SIGTERM)
 			select {
 			case <-quitSig:
-				General.ViperWrite()
+				ViperWrite()
 				log.Fatal("程序退出!")
 			}
 		}
