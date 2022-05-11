@@ -66,8 +66,8 @@ flowchart LR
 
    ```bash
    # WeChatSetup-v3.3.0.115.exe
-   npm --registry https://registry.npm.taobao.org install -g windows-build-tools
-   npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-xp
+   npm --registry http://registry.npmmirror.com install -g windows-build-tools
+   npm --registry http://registry.npmmirror.com install -g wechaty-puppet-xp
    ```
 
 5. Optional operation

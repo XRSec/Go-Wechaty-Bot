@@ -41,7 +41,7 @@ flowchart LR
 
    ```bash
    # node-v16
-   npm --registry https://registry.npm.taobao.org install -g wechaty
+   npm --registry http://registry.npmmirror.com install -g wechaty
    ```
 
 3. Edit `Server/config.yaml`.

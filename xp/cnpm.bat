@@ -1,1 +1,1 @@
-@npm --registry https://registry.npm.taobao.org %*
+@npm --registry http://registry.npmmirror.com %*

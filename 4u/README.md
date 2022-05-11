@@ -67,7 +67,7 @@ flowchart LR
    ```bash
    # node-v16
    npm install -g wechaty wechaty-puppet-xp
-   # npm --registry https://registry.npm.taobao.org install -g wechaty-puppet-xp
+   # npm --registry http://registry.npmmirror.com install -g wechaty-puppet-xp
    ``` -->
 
 ### Start Server
