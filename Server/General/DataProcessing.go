@@ -26,21 +26,48 @@ func init() {
 	// 初始化日志
 	logInit()
 	// 初始化viper
-	viperInit()
+	ViperInit()
 }
 
 /*
 	初始化日志
 */
-func viperInit() {
+func ViperInit() {
 	// 初始化配置文件
-	fileInit(false, viper.GetString("RootPath"))
+	//fileInit(false, viper.GetString("RootPath"))
 	log.Printf("Viper Config Path: [%v]", viper.GetString("RootPath")+"/config.yaml")
 	log.Printf("Logs Path: [%v]", viper.GetString("LogPath"))
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(viper.GetString("RootPath"))
 	fileInit(false, viper.GetString("RootPath")+"/config.yaml")
+	if err = viper.ReadInConfig(); err != nil {
+		log.Errorf("[viper] 读取配置文件失败, Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
+	} else {
+		log.Infof("[viper] 读取配置文件成功")
+	}
+	if viper.GetString("WECHATY.TOKEN") == "" && viper.GetString("BOT.adminID") == "" {
+		viper.Set("BOT.adminID", "wxid_xxxxx")
+		viper.Set("BOT.NAME", "xxxxxxx")
+		viper.Set("WECHATY.ENDPOINT", "127.0.0.1:25001")
+		viper.Set("WECHATY.TOKEN", "insecure_xxxxxxxxxxxxxxxxxxxxxx")
+		viper.Set("WECHATY.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", true)
+		viper.Set("GROUP.XXXXX", "xxxxx@chatroom")
+		viper.Set("GROUP.PASS.1", "xxxxx")
+		viper.Set("GROUP.PASS.2", "xxxxx")
+		viper.Set("DING.SECRET", "xxxxxxxxxxxxxxxxx")
+		viper.Set("DING.TOKEN", "xxxxxxxxxxxxxxxxx")
+		viper.Set("WXOPENAI.ENV", "online")
+		viper.Set("WXOPENAI.SIGNURL", "https://openai.weixin.qq.com/openapi/sign/")
+		viper.Set("WXOPENAI.URL", "https://openai.weixin.qq.com/openapi/aibot/")
+		viper.Set("WXOPENAI.TOKEN", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+		viper.Set("TULING.TOKEN", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&info=")
+		viper.Set("TULING.URL", "http://www.tuling123.com/openapi/api?key=")
+		viper.Set("QINGYUNKE.AppID", 0)
+		viper.Set("QINGYUNKE.Key", "free")
+		viper.Set("QINGYUNKE.URL", "https://api.qingyunke.com/api.php?key=free&appid=0&msg=")
+	}
+	ViperWrite()
 }
 
 /*
@@ -94,37 +121,6 @@ func fileInit(fileAttributes bool, fileName string) {
 				}
 			}(f)
 		}
-	}
-}
-
-/*
-	WechatBotInit()
-	检查环境变量
-*/
-func WechatBotInit() {
-	if err = viper.ReadInConfig(); err != nil {
-		log.Errorf("[viper] 读取配置文件失败, Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-	} else {
-		log.Infof("[viper] 读取配置文件成功")
-	}
-	// WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT
-	if viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT") == "" {
-		viper.Set("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", "false")
-	}
-	if err = os.Setenv("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT")); err != nil {
-		log.Errorf("设置环境变量: [WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT] 失败, Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-	}
-	// ENDPOINT
-	if viper.GetString("wechaty.endpoint") == "" {
-		log.Errorf("请填写服务器地址, endpoint: [%v] CoptRight: [%s]", viper.GetString("wechaty.endpoint"), Copyright(make([]uintptr, 1)))
-		viper.Set("wechaty.endpoint", "Please Fill In Your Server Address")
-		os.Exit(1)
-	}
-	// TOKEN
-	if viper.GetString("Wechaty.Token") == "" {
-		viper.Set("Wechaty.Token", "Please Fill In Your Token")
-		log.Errorf("请填写服务器 Token: [%v] CoptRight: [%s]", viper.GetString("Wechaty.Token"), Copyright(make([]uintptr, 1)))
-		os.Exit(1)
 	}
 }
 

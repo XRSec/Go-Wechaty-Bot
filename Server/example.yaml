@@ -6,7 +6,12 @@ WECHATY:
   TOKEN: insecure_xxxxxxxxxxxxxxxxxxxxxx
   WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
 GROUP:
-  XXXXX: xxxxx@chatroom
+  xxxxx@chatroom:
+    name: xxxxx
+    pass: xxxxx
+GROUPPASS:
+  "1": xxxxx
+  "2": xxxxx
 
 DING:
   SECRET: xxxxxxxxxxxxxxxxxx

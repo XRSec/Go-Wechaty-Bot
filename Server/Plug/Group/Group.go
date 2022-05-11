@@ -1,6 +1,7 @@
 package Group
 
 import (
+	"github.com/spf13/viper"
 	"strings"
 	"time"
 	. "wechatBot/General"
@@ -51,11 +52,13 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	if !m.Status {
 		log.Errorf("Status: [%v] CoptRight: [%v]", m.Status, Copyright(make([]uintptr, 1)))
 	}
-	if strings.Contains(m.RoomName, "nft") || strings.Contains(m.RoomName, "NFT") {
-		log.Printf("NFT Pass, [%v] CoptRight: [%v]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
-		m.PassResult = "NFT"
-		m.Pass = true
-		context.SetData("msgInfo", m)
-		return
+	for _, v := range viper.GetStringMapString("grouppass") {
+		if strings.Contains(message.Text(), v) {
+			log.Printf("%v Pass, [%v] CoptRight: [%v]", v, message.Talker().Name(), Copyright(make([]uintptr, 1)))
+			m.PassResult = v
+			m.Pass = true
+			context.SetData("msgInfo", m)
+			return
+		}
 	}
 }

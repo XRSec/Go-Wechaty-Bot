@@ -210,7 +210,7 @@ func main() {
 	for i <= 10 {
 		i++
 		// 钉钉推送
-		WechatBotInit()
+		ViperInit()
 		var bot = NewWechaty(WithPuppetOption(puppet.Option{
 			Token:    viper.GetString("Wechaty.Token"),
 			Endpoint: viper.GetString("Wechaty.Endpoint"),
@@ -239,22 +239,22 @@ func main() {
 			Use(ExportMessage()).
 			//OnHeartbeat(onHeartbeat).
 			Use(DingMessage())
-			//bot.DaemonStart()
+		//bot.DaemonStart()
 
-			/*
-				Use(func() *Plugin {
-					plug := NewPlugin()
-					plug.OnMessage(func(context *Context, message *user.Message) {
-					})
-					return plug
-				}()).
-				Use(func() *Plugin {
-					plug := NewPlugin()
-					plug.OnMessage(func(context *Context, message *user.Message) {
-					})
-					return plug
-				}())
-			// */
+		/*
+			Use(func() *Plugin {
+				plug := NewPlugin()
+				plug.OnMessage(func(context *Context, message *user.Message) {
+				})
+				return plug
+			}()).
+			Use(func() *Plugin {
+				plug := NewPlugin()
+				plug.OnMessage(func(context *Context, message *user.Message) {
+				})
+				return plug
+			}())
+		// */
 
 		if err = bot.Start(); err != nil {
 			// 重启Bot

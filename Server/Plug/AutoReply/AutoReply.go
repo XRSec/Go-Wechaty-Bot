@@ -135,7 +135,7 @@ func wxApi(message *user.Message) string {
 		log.Errorf("[wx] 解析 signature 信息失败! Error: %v CoptRight: [%v]", wxSession.Errmsg, Copyright(make([]uintptr, 1)))
 		return ""
 	}
-	log.Infof("[wx] 解析 signature 信息成功! Copyright: [%v]", Copyright(make([]uintptr, 1)))
+	//log.Infof("[wx] 解析 signature 信息成功! Copyright: [%v]", Copyright(make([]uintptr, 1)))
 	if resp, err = http.Post(viper.GetString("wxOpenAi.url")+
 		viper.GetString("wxOpenAi.TOKEN"),
 		"application/json", strings.NewReader(
@@ -163,7 +163,7 @@ func wxApi(message *user.Message) string {
 		return ""
 	}
 
-	log.Infof("[wx] 解析 aibot 信息成功!")
+	//log.Infof("[wx] 解析 aibot 信息成功!")
 	// log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
 	if answer.Answer == "" {
 		log.Errorf("[wx] 机器人 回复信息为空 CoptRight: [%s]", Copyright(make([]uintptr, 1)))
