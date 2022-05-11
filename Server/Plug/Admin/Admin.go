@@ -63,7 +63,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		log.Errorf("UserID: [%s] CoptRight: [%s]", m.UserID, Copyright(make([]uintptr, 1)))
 		return
 	}
-	if message.MentionText() == "add" { // 添加好友
+	if message.MentionText() == "add" || message.MentionText() == "加" { // 添加好友
 		var (
 			addUser = message.MentionList()[0]
 			member  _interface.IContact
@@ -88,7 +88,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 
-	if message.MentionText() == "del" { // 从群聊中移除用户
+	if message.MentionText() == "del" || message.MentionText() == "踢" { // 从群聊中移除用户
 		var (
 			delUser = message.MentionList()[0]
 		)
@@ -103,7 +103,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 
-	if message.MentionText() == "quit" { // 退群
+	if message.MentionText() == "quit" || message.MentionText() == "退" { // 退群
 		SayMessage(context, message, "我走了, 拜拜👋🏻, 记得想我哦 [大哭]")
 		if err = message.Room().Quit(); err != nil {
 			log.Errorf("退出群聊失败, 群聊名称: [%v], Error: [%v] CoptRight: [%s]", message.Room().Topic(), err, Copyright(make([]uintptr, 1)))

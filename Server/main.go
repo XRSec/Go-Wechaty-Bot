@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 	. "wechatBot/General"
-
 	. "wechatBot/Plug/Admin"
 	. "wechatBot/Plug/AutoReply"
 	. "wechatBot/Plug/Average"
@@ -15,6 +14,8 @@ import (
 	. "wechatBot/Plug/ExportMessage"
 	. "wechatBot/Plug/FileBox"
 	. "wechatBot/Plug/Group"
+
+	. "wechatBot/Plug/Test"
 
 	"github.com/mdp/qrterminal/v3"
 	log "github.com/sirupsen/logrus"
@@ -24,7 +25,6 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
-	//. "wechatBot/Plug/Test"
 )
 
 var (
@@ -229,32 +229,16 @@ func main() {
 			OnRoomLeave(onRoomleave).
 			OnFriendship(onFriendship).
 			Use(Pretreatment()).
-			//Use(Test())
+			Use(Test()).
 			Use(Group()).
 			Use(Admin()).
 			Use(Average()).
 			Use(AutoReply()).
 			Use(FileBox()).
-			//OnMessage(onMessage).
 			Use(ExportMessage()).
 			//OnHeartbeat(onHeartbeat).
 			Use(DingMessage())
 		//bot.DaemonStart()
-
-		/*
-			Use(func() *Plugin {
-				plug := NewPlugin()
-				plug.OnMessage(func(context *Context, message *user.Message) {
-				})
-				return plug
-			}()).
-			Use(func() *Plugin {
-				plug := NewPlugin()
-				plug.OnMessage(func(context *Context, message *user.Message) {
-				})
-				return plug
-			}())
-		// */
 
 		if err = bot.Start(); err != nil {
 			// 重启Bot

@@ -1,11 +1,12 @@
 package Group
 
 import (
-	"github.com/spf13/viper"
 	"strings"
 	"time"
 	. "wechatBot/General"
 	. "wechatBot/Plug"
+
+	"github.com/spf13/viper"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/wechaty/go-wechaty/wechaty"
@@ -53,7 +54,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		log.Errorf("Status: [%v] CoptRight: [%v]", m.Status, Copyright(make([]uintptr, 1)))
 	}
 	for _, v := range viper.GetStringMapString("grouppass") {
-		if strings.Contains(message.Text(), v) {
+		if strings.Contains(m.RoomName, v) {
 			log.Printf("%v Pass, [%v] CoptRight: [%v]", v, message.Talker().Name(), Copyright(make([]uintptr, 1)))
 			m.PassResult = v
 			m.Pass = true

@@ -39,32 +39,27 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "MessageTypeRecalled"
 		m.Pass = true
-		return
 	}
 	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
 		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "微信团队"
 		m.Pass = true
-		return
 	}
 	if message.Talker().Type().String() == "ContactTypeOfficial" {
 		log.Errorf("Official Pass, [%v] CoptRight: [%s]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "Official"
 		m.Pass = true
-		return
 	}
 	if message.MentionSelf() || message.Room() == nil {
 		if strings.Contains(message.Text(), "所有人") {
 			m.PassResult = "所有人"
 			m.Pass = true
 			log.Errorf("At All Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
-			return
 		}
 		if strings.Contains(message.Text(), "群公告") {
 			m.PassResult = "群公告"
 			m.Pass = true
 			log.Errorf("At Group Of Announcement Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
-			return
 		}
 		m.AtMe = true
 	}
