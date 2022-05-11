@@ -1,3 +1,7 @@
+## -5/11
+
+- Add GroupPass @Plig.Group
+
 ## 05/09
 
 - onMessage 函数 中注册的全局 struct 值容易错,是否启用线程锁?
