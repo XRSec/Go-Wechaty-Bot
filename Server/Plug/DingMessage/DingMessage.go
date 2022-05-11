@@ -2,7 +2,6 @@ package DingMessage
 
 import (
 	"fmt"
-	"os"
 	"time"
 	. "wechatBot/General"
 	. "wechatBot/Plug"
@@ -78,19 +77,14 @@ func DingSend(userID, msg string) {
 
 func onScan(context *wechaty.Context, qrCode string, status schemas.ScanStatus, data string) {
 	if status.String() == "ScanStatusWaiting" {
-		for i := 0; i < 6; i++ {
-			msg := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
-			DingSend(viper.GetString("Bot.AdminID"), msg)
-			time.Sleep(120 * time.Second)
-			if i == 5 {
-				os.Exit(1)
-			}
-		}
+		msg := fmt.Sprintf("账号未登录请扫码!\n\n---\n\n[qrCode](https://wechaty.js.org/qrcode/%v)", qrCode)
+		DingSend(viper.GetString("Bot.AdminID"), msg)
 	} else if status.String() == "ScanStatusScanned" {
 		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	} else {
 		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
 	}
+	time.Sleep(120 * time.Second)
 }
 
 func onLogout(context *wechaty.Context, user *user.ContactSelf, reason string) {

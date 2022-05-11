@@ -60,6 +60,12 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 			log.Errorf("At All Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 			return
 		}
+		if strings.Contains(message.Text(), "群公告") {
+			m.PassResult = "群公告"
+			m.Pass = true
+			log.Errorf("At Group Of Announcement Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+			return
+		}
 		m.AtMe = true
 	}
 	if message.Type() != schemas.MessageTypeText {
