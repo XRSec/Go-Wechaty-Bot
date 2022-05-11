@@ -70,7 +70,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		reply = strings.Replace(message.MentionText(), "print", "", 1)
 	}
 
-	if message.Room() == nil {
+	if !m.Status {
 		if message.Text() == "加群" || message.Text() == "交流群" {
 			keys := ""
 			for k := range viper.GetStringMap("Group") {
