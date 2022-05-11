@@ -39,7 +39,7 @@ jobs:
           go_version: ${{ matrix.go_version }}
           dest: bin
           prefix: wechatBot
-          targets: windows/386,windows/amd64, windows/arm64
+          targets: android/386, android/amd64, android/arm, android/arm64, darwin/amd64, darwin/arm64, freebsd/386, freebsd/amd64, freebsd/arm, freebsd/arm64, linux/386, linux/amd64, linux/arm, linux/arm64, linux/mips, linux/mips64, linux/mips64le, linux/mipsle, linux/ppc64, linux/ppc64le, linux/riscv64, linux/s390x, netbsd/386, netbsd/amd64, netbsd/arm, netbsd/arm64, openbsd/386, openbsd/amd64, openbsd/arm, openbsd/arm64, openbsd/mips64, windows/386, windows/amd64, windows/arm, windows/arm64
           v: false
           x: false
           race: false
@@ -85,7 +85,7 @@ jobs:
 
           # 获取 用户仓库 设置的 URL, 如果没有就输出 Github 地址
           URL="$(jq -r .homepage <(echo ${RESPONSE}))"
-          if [ -n "${URL}" ]; then
+          if [[ "${URL}" != "null" ]]; then
             echo "::set-output name=URL::${URL}"
           else
             echo "::set-output name=URL::${{ GITHUB.SERVER_URL }}/${{ GITHUB.REPOSITORY }}"
