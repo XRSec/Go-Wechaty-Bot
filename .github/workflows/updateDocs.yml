@@ -1,23 +1,44 @@
-name: updated docs
+name: Update Docs
 
 on:
-  push:
-    branches: [ main ]
-    paths:   # 这里是用来指定哪个文件更改，才会触发的
-      - 'docs/**'
-      - '4u/**'
-      - 'padlocal/**'
-      - 'xp/**'
+  repository_dispatch:
+    types: [The beta version is updated]
+  workflow_dispatch:
 
 jobs:
-  Repository_Dispatch:
+  update:
+    name: updateDocs
     runs-on: ubuntu-latest
     steps:
       -
-        name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
+        name: Private Actions Checkout
+        uses: actions/checkout@v2
+      -
+        name: Get Docs
+        id: getdocs
+        run: |
+          set -ex
+          curl -sLH "Authorization: token ${{ SECRETS.TOKEN_GITHUB }}" "https://api.github.com/repos/XRSec/${{ secrets.BETAREPO }}/zipball" -o tmp.zip || exit
+          unzip tmp.zip || exit
+          find * | grep -vE "Server|XRSec" | xargs rm -rf || exit
+          rm -rf XRSec*/Server || exit
+          mv XRSec*/* . || exit
+          rm -rf XRSec* || exit
+          echo "::set-output name=status::true"
+      -
+        name: Update Docs
+        if: steps.getdocs.outputs.status == 'true'
+        id: updatedocs
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add . || exit
+          git commit -m "The beta version is updated" -a || exit
+          echo "::set-output name=status::true"
+      -
+        name: Push changes
+        if: steps.updatedocs.outputs.status == 'true'
+        uses: ad-m/github-push-action@master
         with:
-          token: ${{ secrets.TOKEN_GITHUB }}
-          repository: ${{ github.repository_owner }}/Go-Wechaty-Bot
-          event-type: The beta version is updated
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          github_token: ${{ secrets.TOKEN_GITHUB }}
+          branch: ${{ github.ref }}
