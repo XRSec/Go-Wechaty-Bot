@@ -48,17 +48,15 @@ flowchart LR
 
    ```bash
    WECHATY_PUPPET_PADLOCAL_TOKEN: http://pad-local.com/#/tokens
-   WECHATY_TOKEN：curl -s https://www.uuidgenerator.net/api/version4
-   WECHATY_PUPPET_SERVICE_TOKEN："insecure_" + WECHATY_TOKEN
-   # WECHATY_TOKEN WECHATY_PUPPET_SERVICE_TOKEN 可同可不同
+   WECHATY_TOKEN："insecure_" + curl -s https://www.uuidgenerator.net/api/version4
+   WECHATY_PUPPET_SERVICE_TOKEN：WECHATY_TOKEN
    ```
 
 3. Modifying a Configuration File
 
    ```bash
    # wechatyGateway.sh
-   export WECHATY_TOKEN="xxxxxxxxxxxxxxxx"
-   export WECHATY_PUPPET_SERVICE_TOKEN="insecure_xxxxxxxxxxxxxxxx"
+   export WECHATY_TOKEN="insecure_xxxxxxxx_xxxx_xxxx"
    export WECHATY_PUPPET_PADLOCAL_TOKEN="puppet_padlocal_xxxxxxxxxxxxxxxx"
    export WECHATY_PUPPET_SERVER_PORT="25000"
    ```
@@ -74,6 +72,6 @@ flowchart LR
 ### Start Server
 
 ```bash
-cd padlocal && bash ./wechatyGateway.sh # Start puppet-xp Gateway
+cd padlocal && npm install && bash ./wechatyGateway.sh # Start puppet-padlocal Gateway
 cd server && go run main.go # Start Server
 ```
