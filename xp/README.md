@@ -65,7 +65,9 @@ flowchart LR
 4. Install the Software ([**WeChat.exe Check Download**](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe))
 
    ```bash
-   # WeChatSetup-v3.3.0.115.exe
+   # Must install on Powershell ( because env )
+   ## WeChatSetup-v3.3.0.115.exe
+
    npm --registry http://registry.npmmirror.com install -g windows-build-tools
    npm --registry http://registry.npmmirror.com install -g wechaty-puppet-xp
    ```

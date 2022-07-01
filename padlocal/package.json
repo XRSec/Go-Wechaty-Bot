@@ -1,0 +1,12 @@
+{
+  "name": "go-wechaty-bot",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-padlocal": "^1.20.1"
+  },
+  "scripts": {
+    "serve": "node_modules/.bin/wechaty gateway --puppet ${WECHATY_PUPPET} --port ${WECHATY_PUPPET_SERVER_PORT} --token ${WECHATY_TOKEN} --puppet-token ${WECHATY_PUPPET_PADLOCAL_TOKEN}"
+  }
+}

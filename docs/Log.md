@@ -1,4 +1,10 @@
-## -5/11
+## 05//15
+
+- Add sql plugin
+- del AutoInfo key
+- add ID key
+
+## 05/11
 
 - Add GroupPass @Plig.Group
 
