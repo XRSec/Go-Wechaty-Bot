@@ -2,6 +2,12 @@
   "name": "go-wechaty-bot",
   "version": "1.0.0",
   "license": "MIT",
+  "homepage": "https://github.com/XRSec/Go-Wechaty-Bot.git",
+  "url" : "https://blog.zygd.site/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XRSec/Go-Wechaty-Bot.git"
+  },
   "dependencies": {
     "wechaty": "^1.20.2",
     "wechaty-puppet-padlocal": "^1.20.1"
