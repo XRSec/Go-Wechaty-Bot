@@ -1,4 +1,16 @@
-## 05//15
+## 07/06
+- Add Gateway Docker Solution
+- Add Gateway Container
+- Add AutoRestart Docker Solution
+- Add AutoRestart Container
+- Fix Gateway Connection Error
+- Fix Gateway Reconnection Error
+- Add DataProcessimg Bot
+- Fix padlocal README.md
+- Add padlocal wechatyGateway.sh
+- 更新配置文件位置 请查看日志获取路径
+
+## 05/15
 
 - Add sql plugin
 - del AutoInfo key
