@@ -9,6 +9,7 @@
 - Fix padlocal README.md
 - Add padlocal wechatyGateway.sh
 - 更新配置文件位置 请查看日志获取路径
+- 更新日志文件位置 请查看日志获取路径
 
 ## 05/15
 
