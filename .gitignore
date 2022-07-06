@@ -5,8 +5,9 @@ tmp
 main.exe
 data.json
 test.sh
-.vscode/settings.json
+.vscode
 logs
 *.memory-card.json
-padlocal/node_modules
-padlocal/package-lock.json
+node_modules
+package-lock.json
+yarn.lock
