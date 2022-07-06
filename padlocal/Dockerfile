@@ -21,4 +21,4 @@ ENV WECHATY_PUPPET_PADLOCAL_TOKEN puppet_padlocal_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ENV LANG 'zh_CN.UTF-8'
 STOPSIGNAL SIGQUIT
 
-CMD ["wechaty","gateway","--puppet","\${WECHATY_PUPPET}","--port","\${WECHATY_PUPPET_SERVER_PORT}","--token","\${WECHATY_TOKEN}","--puppet-token","\${WECHATY_PUPPET_PADLOCAL_TOKEN}"]
+CMD ["npm", "run", "serve"]
