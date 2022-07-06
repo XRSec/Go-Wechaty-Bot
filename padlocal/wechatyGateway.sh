@@ -15,25 +15,28 @@ export WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER="true"
 
 echo "WECHATY_TOKEN = ${WECHATY_TOKEN}"
 
-#if [ ! -n "$1" ]; then
-#    export tag="0.78"
-#else
-#    export tag=$1
-#fi
+# *********************PLAN 1***********************
+if [ ! -n "$1" ]; then
+    export tag="gateway"
+else
+    export tag=$1
+fi
 
-#touch "$(pwd)/${WECHATY_TOKEN}.memory-card.json"
+docker build -t wechaty/wechaty:gateway .
 
-# docker run -ti --rm \
-#     --name wechatBot \
-#     -e WECHATY_TOKEN \
-#     -e WECHATY_PUPPET_SERVICE_TOKEN \
-#     -e WECHATY_PUPPET_PADLOCAL_TOKEN \
-#     -e WECHATY_LOG \
-#     -e WECHATY_PUPPET \
-#     -e WECHATY_PUPPET_SERVER_PORT \
-#     -e WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER \
-#     -p "${WECHATY_PUPPET_SERVER_PORT}:${WECHATY_PUPPET_SERVER_PORT}" \
-#     wechaty/wechaty:"${tag}"
-    #    -v "$(pwd)/${WECHATY_TOKEN}.memory-card.json:/wechaty/${WECHATY_TOKEN}.memory-card.json" \
+docker run -ti --rm \
+   --name wechatBot \
+   -e WECHATY_TOKEN \
+   -e WECHATY_PUPPET_PADLOCAL_TOKEN \
+   -e WECHATY_LOG \
+   -e WECHATY_PUPPET \
+   -e WECHATY_PUPPET_SERVER_PORT \
+   -e WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER \
+   -p "${WECHATY_PUPPET_SERVER_PORT}:${WECHATY_PUPPET_SERVER_PORT}" \
+   wechaty/wechaty:"${tag}"
+# *********************PLAN 1***********************
 
-npm run serve
+
+# *********************PLAN 2***********************
+#npm run serve
+# *********************PLAN 2***********************
