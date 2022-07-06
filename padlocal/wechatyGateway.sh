@@ -22,7 +22,11 @@ else
     export tag=$1
 fi
 
-docker build -t wechaty/wechaty:gateway .
+#docker images wechaty/wechaty | grep gateway | wc -l == 0
+
+if [ "$(docker images wechaty/wechaty | grep -c gateway)" == "0" ]; then
+    docker build -t wechaty/wechaty:gateway .
+fi
 
 docker run -ti --rm \
    --name wechatBot \
