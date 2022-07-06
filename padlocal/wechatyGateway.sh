@@ -28,7 +28,7 @@ if [ "$(docker images wechaty/wechaty | grep -c gateway)" == "0" ]; then
     docker build -t wechaty/wechaty:gateway .
 fi
 
-docker run -ti --rm \
+docker run -itd \
    --name wechatBot \
    -e WECHATY_TOKEN \
    -e WECHATY_PUPPET_PADLOCAL_TOKEN \
