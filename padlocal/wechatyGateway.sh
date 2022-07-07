@@ -24,7 +24,7 @@ fi
 
 #docker images wechaty/wechaty | grep gateway | wc -l == 0
 
-if [ "$(docker images wechaty/wechaty | grep -c gateway)" == "0" ]; then
+if [ "${tag}" == "gateway" ] && [ "$(docker images wechaty/wechaty | grep -c gateway)" == "0" ]; then
     docker build -t wechaty/wechaty:gateway .
 fi
 
