@@ -22,6 +22,7 @@ touch "$(pwd)/${WECHATY_TOKEN}.memory-card.json"
 docker run -ti --rm \
     --name wechatBot \
     -e WECHATY_TOKEN \
+    -e TZ=Asia/Shanghai \
     -e WECHATY_PUPPET_SERVICE_TOKEN \
     -e WECHATY_LOG \
     -e WECHATY_PUPPET \

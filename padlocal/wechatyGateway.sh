@@ -32,6 +32,7 @@ docker run -itd \
    --name wechatBot \
    --restart=always \
    -e WECHATY_TOKEN \
+   -e TZ=Asia/Shanghai \
    -e WECHATY_PUPPET_PADLOCAL_TOKEN \
    -e WECHATY_LOG \
    -e WECHATY_PUPPET \
