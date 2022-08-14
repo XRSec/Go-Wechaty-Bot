@@ -1,6 +1,6 @@
 FROM  node:16
 LABEL maintainer="xrsec"
-LABEL mail="troy@zygd.site"
+LABEL mail="Jalapeno1868@outlook.com"
 LABEL Github="https://github.com/XRSec/Go-Wechaty-Bot"
 LABEL org.opencontainers.image.source="https://github.com/XRSec/Go-Wechaty-Bot"
 LABEL org.opencontainers.image.title="Go-Wechaty-Bot"
