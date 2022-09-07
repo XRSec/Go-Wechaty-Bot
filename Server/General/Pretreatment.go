@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	. "wechatBot/Plug"
+	"wechatBot/Plug"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -26,7 +26,9 @@ func Pretreatment() *wechaty.Plugin {
 }
 
 func onMessage(context *wechaty.Context, message *user.Message) {
-	var m MessageInfo
+	log.Infof("[onMessage] Message: [%v]", message)
+	var m Plug.MessageInfo
+	m.ID = message.ID()
 	m.UserName = message.Talker().Name()
 	m.UserID = message.Talker().ID()
 	m.Date = message.Date().Format("2006-01-02 15:04:05")
@@ -36,49 +38,55 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	m.AtMe = false
 	// 公众号消息
 	if message.Type() == schemas.MessageTypeRecalled {
-		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "MessageTypeRecalled"
 		m.Pass = true
 	}
+	// TODO 计划删除 微信团队
 	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
-		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "微信团队"
 		m.Pass = true
 	}
+	// 公众号消息
 	if message.Talker().Type().String() == "ContactTypeOfficial" {
-		log.Errorf("Official Pass, [%v] CoptRight: [%s]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
+		log.Infof("Official Pass, [%v] CoptRight: [%s]", message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		m.PassResult = "Official"
 		m.Pass = true
 	}
+	// 所有人消息
 	if message.MentionSelf() || message.Room() == nil {
 		if strings.Contains(message.Text(), "所有人") {
 			m.PassResult = "所有人"
 			m.Pass = true
-			log.Errorf("At All Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+			log.Infof("At All Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		}
 		if strings.Contains(message.Text(), "群公告") {
 			m.PassResult = "群公告"
 			m.Pass = true
-			log.Errorf("At Group Of Announcement Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+			log.Infof("At Group Of Announcement Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		}
 		m.AtMe = true
 	}
+	// 未知消息
 	if message.Type() != schemas.MessageTypeText {
 		m.Content = "[未知消息类型: " + message.Type().String() + "] " + message.Text()
 	} else {
 		m.Content = message.Text()
 	}
-	m.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v]", m.UserID, m.UserName, m.Content)
+	//群聊消息
 	//m.AutoInfo = fmt.Sprintf("用户ID: [%v] 用户名称: [%v] 说: [%v]", m.UserID, m.UserName, strings.Replace(m.Content, "\u2005", " ", -1))
 	if message.Room() != nil {
 		m.RoomName = message.Room().Topic()
 		m.RoomID = message.Room().ID()
 		m.Status = true
-		m.AutoInfo = fmt.Sprintf("群聊ID: [%v] 群聊名称: [%v] %v", m.RoomID, m.RoomName, m.AutoInfo)
+	}
+	if !NightMode(m.UserID) {
+		m.PassResult = "夜间模式"
+		m.Pass = true
 	}
 	context.SetData("msgInfo", m)
-	chatTimeLimit(context, message)
-	//chatTimeLimit(viper.GetString(fmt.Sprintf("Chat.%v.Date", m.UserID)))
+	chatTimeLimit(context)
 }
 
 /*
@@ -86,10 +94,15 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		: 判断消息是否在规定时间内
 		: 如果是，则返回true，否则返回false
 */
-func chatTimeLimit(context *wechaty.Context, message *user.Message) {
-	m, ok := (context.GetData("msgInfo")).(MessageInfo)
+func chatTimeLimit(context *wechaty.Context) {
+	m, ok := (context.GetData("msgInfo")).(Plug.MessageInfo)
 	if !ok {
 		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
+	}
+	// 管理员取消限制
+	if m.UserID == viper.GetString("Bot.AdminID") {
+		log.Infof("[chatTimeLimit] 管理员 Copyright: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	//当前时间
@@ -100,7 +113,7 @@ func chatTimeLimit(context *wechaty.Context, message *user.Message) {
 		date     = viper.GetString(fmt.Sprintf("Chat.%v.Date", m.UserID))
 	)
 	if date == "" {
-		log.Errorf("Not Set Date, CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Not Set Date, CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
@@ -120,15 +133,14 @@ func chatTimeLimit(context *wechaty.Context, message *user.Message) {
 	}
 	//计算两个时间相差的秒数
 	if second := int(now.Sub(lastDate).Seconds()); second < 30 {
-		log.Errorf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d] CoptRight: [%s]", lastDate, now, second, Copyright(make([]uintptr, 1)))
+		log.Infof("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d] CoptRight: [%s]", lastDate, now, second, Copyright(make([]uintptr, 1)))
 		// Messages.Reply = fmt.Sprintf("[ChatTimeLimit] 时间相差不足 开始时间: [%v], 结束时间: [%v], 相差秒数: [%d]", lastDate, now, second)
 		m.PassResult = "ChatTimeLimit"
 		m.Pass = true
 		context.SetData("msgInfo", m)
 		return
-	} else {
-		log.Error("[ChatTimeLimit] 时间相差超过 30 秒")
 	}
+	log.Infof("[ChatTimeLimit] 时间相差超过 30 秒")
 }
 
 /*
@@ -138,12 +150,15 @@ func chatTimeLimit(context *wechaty.Context, message *user.Message) {
 	请确保你设置过了 ChatTimeLimit函数
 */
 func SayMessage(context *wechaty.Context, message *user.Message, msg string) {
-	m, ok := (context.GetData("msgInfo")).(MessageInfo)
+	m, ok := (context.GetData("msgInfo")).(Plug.MessageInfo)
 	if !ok {
 		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if !NightMode(m.UserID) { // 夜间模式
+		// 什么情况下会跳过 Pretreatment 不记录呢？
+		m.PassResult = "NightMode"
+		m.Pass = true
 		return
 	}
 
@@ -159,17 +174,12 @@ func SayMessage(context *wechaty.Context, message *user.Message, msg string) {
 	}
 
 	// TODO 0.79 私聊有问题
-	//if _, err = message.Say(msg); err != nil {
-	//	log.Errorf("[SayMessage] [%v], error: %v CoptRight: [%s]", msg, err, Copyright(make([]uintptr, 1)))
-	//	return
-	//}
-
 	if _, err = message.Say(msg); err != nil {
-		log.Errorf("SayMessage Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
+		log.Errorf("[SayMessage] [%v], error: %v CoptRight: [%s]", msg, err, Copyright(make([]uintptr, 1)))
 	}
+
 	m.ReplyResult = msg
 	m.Reply = true
-	//m.AutoInfo += fmt.Sprintf(" 回复: [%v]", msg)
 	context.SetData("msgInfo", m)
 	viper.Set(fmt.Sprintf("Chat.%v.Date", m.UserID), m.Date)
 }

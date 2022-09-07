@@ -1,10 +1,21 @@
 BOT:
-  adminID: wxid_xxxxx
+  ADMINID: wxid_xxxxx
   NAME: xxxxxxxx
+  GROUP: Debug
+  Docker: wechatBot
+#SYSLOG:
+#  STATUS: false
+#  PROTOCOL: udp
+#  REMOTE_ADDRESS:  localhost:514
 WECHATY:
-  ENDPOINT: 127.0.0.1:25001
-  TOKEN: insecure_xxxxxxxxxxxxxxxxxxxxxx
+  GATEWAY: false
+  WECHATY_ENDPOINT: 127.0.0.1:25000
+  WECHATY_LOG: verbose
+  WECHATY_PUPPET_PADLOCAL_TOKEN: puppet_padlocal_xxxxxxxxxxxxxxxxxx
+  WECHATY_PUPPET_SERVER_PORT: 25000
   WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
+  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER: true
+  WECHATY_TOKEN: insecure_xxxxxxxxxxxxxxxxxxxxxx
 GROUP:
   xxxxx@chatroom:
     name: xxxxx
@@ -28,3 +39,5 @@ QingYunKe:
   AppID: 0
   Key: free
   URL: https://api.qingyunke.com/api.php?key=free&appid=0&msg=
+MYSQL:
+  HOST: user:name@tcp(ip:port)/database_name?charset=utf8mb4&parseTime=True&loc=Local

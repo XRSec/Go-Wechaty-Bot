@@ -3,6 +3,11 @@ package AutoReply
 import (
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"github.com/wechaty/go-wechaty/wechaty"
+	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
+	"github.com/wechaty/go-wechaty/wechaty/user"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,15 +16,9 @@ import (
 	"time"
 	. "wechatBot/General"
 	. "wechatBot/Plug"
-
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"github.com/wechaty/go-wechaty/wechaty"
-	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
-	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
-func AutoReply() *wechaty.Plugin {
+func New() *wechaty.Plugin {
 	plug := wechaty.NewPlugin()
 	plug.OnMessage(onMessage)
 	return plug
@@ -32,27 +31,27 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if m.Pass {
-		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if m.Reply {
-		log.Errorf("Reply CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Reply CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if !m.AtMe {
-		log.Errorf("AtMe CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("AtMe CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Type() != schemas.MessageTypeText {
-		log.Errorf("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Self() {
-		log.Errorf("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Age() > 2*60*time.Second {
-		log.Errorf("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
+		log.Infof("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
 		return
 	}
 
@@ -69,6 +68,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	var msg string
 	if message.MentionText() == "" {
 		msg = "你想表达什么[破涕为笑]?"
+		goto labelSay
 	}
 	if msg = wxApi(message); msg != "" {
 		goto labelSay
@@ -139,8 +139,8 @@ func wxApi(message *user.Message) string {
 	if resp, err = http.Post(viper.GetString("wxOpenAi.url")+
 		viper.GetString("wxOpenAi.TOKEN"),
 		"application/json", strings.NewReader(
-			// fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, message.MentionText(), viper.GetString("WXopenai.ENV")))); err != nil {
-			fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, url.QueryEscape(message.MentionText()), viper.GetString("WXopenai.ENV")))); err != nil {
+			fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, message.MentionText(), viper.GetString("WXopenai.ENV")))); err != nil {
+		//fmt.Sprintf(`{"signature": "%v", "query": "%v","env": "%v"}`, wxSession.Signature, url.QueryEscape(message.MentionText()), viper.GetString("WXopenai.ENV")))); err != nil {
 		log.Errorf("[wx] 请求 aibot 接口失败! Error: [%v] CoptRight: [%v]:", err, Copyright(make([]uintptr, 1)))
 		return ""
 	}
@@ -166,7 +166,6 @@ func wxApi(message *user.Message) string {
 	//log.Infof("[wx] 解析 aibot 信息成功!")
 	// log.Printf("[wx] msg: [%v], Answer: [%v], Confidence: [%v], Errcode: [%v], Errmsg: [%v]", message.MentionText(), answer.Answer, answer.Confidence, answer.Errcode, answer.Errmsg)
 	if answer.Answer == "" {
-		log.Errorf("[wx] 机器人 回复信息为空 CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return ""
 	}
 	return answer.Answer
@@ -202,7 +201,7 @@ func qingYunKe(msg string) string {
 	// CoptRight: [%v]
 	// 判断响应码
 	if q.Result != 0 {
-		log.Errorf("[青云客] 机器人返回错误: [%v] CoptRight: [%v]", q.Content, Copyright(make([]uintptr, 1)))
+		log.Infof("[青云客] 机器人返回错误: [%v] CoptRight: [%v]", q.Content, Copyright(make([]uintptr, 1)))
 		return ""
 	}
 	// 输出结果
@@ -252,7 +251,7 @@ func tuLingApi(msg string) string {
 		if t.Text != "你想和我说什么呢?" {
 			return ""
 		}
-		log.Errorf("[图灵] 机器人返回错误: [%v] CoptRight: [%v]", t.Text, Copyright(make([]uintptr, 1)))
+		log.Infof("[图灵] 机器人返回错误: [%v] CoptRight: [%v]", t.Text, Copyright(make([]uintptr, 1)))
 	}
 	// 输出结果
 	log.Infof("[图灵] 机器人 回复信息: %v CoptRight: [%v]", t.Text, Copyright(make([]uintptr, 1)))

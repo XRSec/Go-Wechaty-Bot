@@ -7,15 +7,15 @@ import (
 	"syscall"
 	"time"
 	. "wechatBot/General"
-	. "wechatBot/Plug/Admin"
-	. "wechatBot/Plug/AutoReply"
-	. "wechatBot/Plug/Average"
-	. "wechatBot/Plug/DingMessage"
-	. "wechatBot/Plug/ExportMessage"
-	. "wechatBot/Plug/FileBox"
-	. "wechatBot/Plug/Group"
-
-	. "wechatBot/Plug/Test"
+	"wechatBot/Plug/Admin"
+	"wechatBot/Plug/Average"
+	"wechatBot/Plug/Cron"
+	ExportMessages "wechatBot/Plug/ExportMessage"
+	"wechatBot/Plug/FileBox"
+	"wechatBot/Plug/Group"
+	"wechatBot/Plug/GroupForward"
+	"wechatBot/Plug/Health"
+	"wechatBot/Plug/Test"
 
 	"github.com/mdp/qrterminal/v3"
 	log "github.com/sirupsen/logrus"
@@ -44,9 +44,15 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 		fmt.Printf("\n\n")
 		log.Printf("[Scan] https://wechaty.js.org/qrcode/%v %v", qrCode, data)
 	} else if status.String() == "ScanStatusScanned" {
-		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
+		fmt.Printf("[Scan] Scanned: %v %v\n", status.String(), data)
+	} else if status.String() == "ScanStatusCancel" {
+		fmt.Printf("[Scan] Cancel: %v %v\n", status.String(), data)
+	} else if status.String() == "ScanStatusTimeout" {
+		fmt.Printf("[Scan] Timeout: %v %v\n", status.String(), data)
+	} else if status.String() == "ScanStatusConfirmed" {
+		fmt.Printf("[Scan] Confirmed: %v %v\n", status.String(), data)
 	} else {
-		fmt.Printf("[Scan] Status: %v %v\n", status.String(), data)
+		fmt.Printf("[Scan] Unknow Status: %v %v\n", status.String(), data)
 	}
 }
 
@@ -117,34 +123,6 @@ func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic st
 }
 
 /*
-	进入房间监听回调 room-群聊 inviteeList-受邀者名单 inviter-邀请者
-	判断配置项群组id数组中是否存在该群聊id
-*/
-func onRoomJoin(context *Context, room *user.Room, inviteeList []_interface.IContact, inviter _interface.IContact, date time.Time) {
-	fmt.Println("========================onRoomJoin👇========================")
-	newUser := inviteeList[0].Name()
-	if inviteeList[0].Self() {
-		log.Infof("机器人加入群聊, 群聊名称:[%v] ,邀请人: [%v], 时间: [%v]", room.Topic(), inviter.Name(), date)
-		if _, err = room.Say(fmt.Sprintf("大家好呀.我是%v, 以后请多多关照!", newUser)); err != nil {
-			log.Errorf("[onRoomJoin] 加入群聊自我介绍消息发送失败, Error: %v CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-			return
-		} else {
-			log.Infof("[onRoomJoin] 加入群聊自我介绍消息发送成功")
-			return
-		}
-	}
-	log.Infof("群聊名称: [%v], 新人: [%v], 邀请人: [%v], 时间: [%v]", room.Topic(), newUser, inviter.Name(), date)
-	//if !Plug.NightMode(inviter.ID()) {
-	//	return
-	//}
-	if _, err = room.Say(fmt.Sprintf("@%v 欢迎新人!", newUser)); err != nil {
-		log.Errorf("[onRoomJoin] 欢迎新人加入群聊消息发送失败, Error: %v CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-	} else {
-		log.Infof("[onRoomJoin] 欢迎新人加入群聊消息发送成功")
-	}
-}
-
-/*
 	@method onRoomleave 当机器人把群里某个用户移出群聊的时候会触发这个时间。用户主动退群是无法检测到的。
 	@param {*} user
 */
@@ -186,61 +164,55 @@ func onFriendship(context *Context, friendship *user.Friendship) {
 	log.Infof("[onFriendship] %v好友关系是: %v Hello: %v ", friendship.Contact().Name(), friendship.Type(), friendship.Hello())
 }
 
-/*
-	@method onHeartbeat 获取机器人的心跳。
-	@param {*} user
-*/
-func onHeartbeat(context *Context, data string) {
-	fmt.Println("========================onHeartbeat👇========================")
-	log.Printf("[onHeartbeat] 获取机器人的心跳: %v", data)
-}
-
 func onError(context *Context, err error) {
-	//log.Errorf("[onError] Error: [%v] 消息来自函数: [%v]", err, Plug.Copyright(make([]uintptr, 1)))
+	log.Errorf("[onError] Error: [%v] 消息来自函数: [%v]", err, Copyright(make([]uintptr, 1)))
+	// Call with too few input arguments
 }
 
-func main() {
-	i := 0
-	// 重试次数 10
-	defer func() {
-		if err := recover(); err != nil {
-			log.Errorf("Error: %v CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-		}
-	}()
-	for i <= 10 {
-		i++
+func info() {
+	fmt.Println("\n\n--------------------")
+	fmt.Printf("LogPath: %v/wechatBot.log \n", viper.GetString("LogPath"))
+	fmt.Printf("Config: %v/config.yaml \n", viper.GetString("RootPath"))
+	fmt.Printf("Token: %v \n", viper.GetString("Wechaty.WECHATY_TOKEN"))
+	fmt.Printf("Endpoint: %v \n", viper.GetString("Wechaty.WECHATY_ENDPOINT"))
+	fmt.Printf("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: %v \n", viper.GetString("WECHATY.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT"))
+	fmt.Println("--------------------\n\n")
+}
+
+func wechatBotDaemon() {
+	for i := 0; i <= 10; i++ {
 		// 钉钉推送
 		ViperInit()
-		var bot = NewWechaty(WithPuppetOption(puppet.Option{
-			Token:    viper.GetString("Wechaty.Token"),
-			Endpoint: viper.GetString("Wechaty.Endpoint"),
+		info()
+		Bot = NewWechaty(WithPuppetOption(puppet.Option{
+			Token:    viper.GetString("WECHATY.WECHATY_TOKEN"),
+			Endpoint: viper.GetString("WECHATY.WECHATY_ENDPOINT"),
 		}))
-		log.Printf("Token: %v", viper.GetString("Wechaty.Token"))
-		log.Printf("Endpoint: %v", viper.GetString("Wechaty.Endpoint"))
-		log.Printf("WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: [%v]", viper.GetString("wechaty.WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT"))
 
-		bot.OnScan(onScan).
+		Bot.OnScan(onScan).
 			OnLogin(onLogin).
 			OnLogout(onLogout).
 			OnError(onError).
 			OnRoomInvite(onRoomInvite). // 有问题，暂时不用，等待修复
 			OnRoomTopic(onRoomTopic).
-			OnRoomJoin(onRoomJoin).
+			//OnRoomJoin(onRoomJoin).
 			OnRoomLeave(onRoomleave).
 			OnFriendship(onFriendship).
+			Use(Health.New()).
 			Use(Pretreatment()).
-			Use(Test()).
-			Use(Group()).
-			Use(Admin()).
-			Use(Average()).
-			Use(AutoReply()).
-			Use(FileBox()).
-			Use(ExportMessage()).
-			//OnHeartbeat(onHeartbeat).
-			Use(DingMessage())
+			Use(Test.New()).
+			Use(Cron.New()).
+			Use(Group.New()).
+			Use(GroupForward.New()).
+			Use(Admin.New()).
+			Use(Average.New()).
+			//Use(AutoReply.New()).
+			Use(FileBox.New()).
+			Use(ExportMessages.New())
+		//Use(DingMessage.New())
 		//bot.DaemonStart()
 
-		if err = bot.Start(); err != nil {
+		if err = Bot.Start(); err != nil {
 			// 重启Bot
 			log.Infof("[main] Bot 错误: %v", err)
 			if i > 10 {
@@ -260,4 +232,14 @@ func main() {
 			}
 		}
 	}
+}
+
+func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Errorf("Error: %v CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
+		}
+	}()
+	// 重试次数 10
+	wechatBotDaemon()
 }

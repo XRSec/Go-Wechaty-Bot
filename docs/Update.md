@@ -1,15 +1,12 @@
 ## Add
 
-- 添加自动重启 Docker 方案
-- 添加 Gateway Docker 方案
-- 添加 Gateway 容器
-- 更新配置文件位置 请查看日志获取路径
-- 更新日志文件位置 请查看日志获取路径
+- 添加节日祝福助手,请查看`GroupForward`代码 获取关键词
+- 添加健康监测功能,请查看`Health`代码 获取详细信息
 
 ## Fiex
 
-- 修复 Gateway 异常掉线重连问题
+- 关闭自动回复功能
 
 ## TODO
 
-- 重构优化
+- 等待 [Wechaty-UI](https://github.com/wechaty/wechaty-ui) 正式上线

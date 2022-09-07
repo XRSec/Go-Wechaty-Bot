@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
-	_interface "github.com/wechaty/go-wechaty/wechaty/interface"
 	"github.com/wechaty/go-wechaty/wechaty/user"
 )
 
@@ -23,7 +22,7 @@ var (
 	Admin()
 	管理员
 */
-func Admin() *wechaty.Plugin {
+func New() *wechaty.Plugin {
 	plug := wechaty.NewPlugin()
 	plug.OnMessage(onMessage)
 	return plug
@@ -36,55 +35,58 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if m.Pass {
-		log.Errorf("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Pass CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if m.Reply {
-		log.Errorf("Reply CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Reply CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		return
+	}
+	if !m.Status {
+		log.Infof("Room Status CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	//if !m.AtMe {
-	//	log.Errorf("AtMe CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+	//	log.Infof("AtMe CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 	//	return
 	//}
 	if message.Type() != schemas.MessageTypeText {
-		log.Errorf("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Self() {
-		log.Errorf("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
+		log.Infof("Self CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Age() > 2*60*time.Second {
-		log.Errorf("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
+		log.Infof("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
 		return
 	}
 	if m.UserID != viper.GetString("Bot.AdminID") {
-		log.Errorf("UserID: [%s] CoptRight: [%s]", m.UserID, Copyright(make([]uintptr, 1)))
+		log.Infof("UserID: [%s] CoptRight: [%s]", m.UserID, Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.MentionText() == "add" || message.MentionText() == "加" { // 添加好友
+
 		var (
 			addUser = message.MentionList()[0]
-			member  _interface.IContact
+			//member  _interface.IContact
 		)
 		//if member, err = message.Room().Member(addUserName); err != nil && member != nil {
 		//	log.Errorf(fmt.Sprintf("搜索用户名ID失败, 用户名: [%v], 用户信息: [%v]", addUserName, member.String()), err)
 		//}
-		//log.Printf("搜索用户名ID成功, 用户名: [%v]", addUser.Name())
 		if message.GetWechaty().Contact().Load(addUser.ID()).Friend() {
 			log.Infof("用户已经是好友, 用户名: [%v] CoptRight: [%s]", addUser.Name(), Copyright(make([]uintptr, 1)))
-			SayMessage(context, message, fmt.Sprintf("用户: [%v] 已经是好友了", addUser))
+			SayMessage(context, message, fmt.Sprintf("用户: [%v] 已经是好友了", addUser.Name()))
 			return
 		}
-
-		if err = message.GetWechaty().Friendship().Add(member, fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("Bot.Name"))); err != nil {
-			log.Errorf("添加好友失败, 用户名: [%v], Error: [%v] CoptRight: [%s]", addUser, err, Copyright(make([]uintptr, 1)))
-			SayMessage(context, message, fmt.Sprintf("添加好友失败, 用户: [%v]", addUser))
+		// TODO 目前这个模块有问题
+		if err = message.GetWechaty().Friendship().Add(addUser, fmt.Sprintf("你好,我是%v,以后请多多关照!", viper.GetString("Bot.Name"))); err != nil {
+			log.Errorf("添加好友失败, 用户名: [%v], Error: [%v] CoptRight: [%s]", addUser.Name(), err, Copyright(make([]uintptr, 1)))
+			SayMessage(context, message, fmt.Sprintf("添加好友失败, 用户: [%v]\n 是不是没开权限哦[旺柴]", addUser.Name()))
 			return
 		}
-
-		SayMessage(context, message, fmt.Sprintf("好友申请发送成功, 用户: [%v]", addUser))
+		SayMessage(context, message, fmt.Sprintf("好友申请发送成功, 用户: [%v]", addUser.Name()))
 		return
 	}
 

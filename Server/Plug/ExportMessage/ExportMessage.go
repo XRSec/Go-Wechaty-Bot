@@ -1,34 +1,33 @@
 package ExportMessages
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"time"
-	. "wechatBot/General"
-	. "wechatBot/Plug"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/wechaty/go-wechaty/wechaty"
 	"github.com/wechaty/go-wechaty/wechaty-puppet/schemas"
 	"github.com/wechaty/go-wechaty/wechaty/user"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"time"
+	. "wechatBot/General"
+	. "wechatBot/Plug"
 )
 
 var (
-	fp       *os.File
-	filename = viper.GetString("RootPath") + "/data.json"
-	result   []byte
-	err      error
+	err error
+	db  *gorm.DB
 )
 
 /*
 	ExportMessages()
 	对消息内容进行存储
 */
-func ExportMessage() *wechaty.Plugin {
+
+func New() *wechaty.Plugin {
 	plug := wechaty.NewPlugin()
-	plug.OnMessage(onMessage)
+	plug.
+		OnLogin(onLogin).
+		OnMessage(onMessage)
 	return plug
 }
 
@@ -38,14 +37,8 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		log.Errorf("Conversion Failed CoptRight: [%s]", Copyright(make([]uintptr, 1)))
 		return
 	}
-	if m.Pass {
-		m.AutoInfo += fmt.Sprintf(" Pass: [%v]", m.PassResult)
-	}
-	if m.Reply {
-		m.AutoInfo += fmt.Sprintf(" 回复: [%v]", m.ReplyResult)
-	}
 	if message.Type() != schemas.MessageTypeText {
-		log.Errorf("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type: [%v] CoptRight: [%v]", message.Type().String(), Copyright(make([]uintptr, 1)))
 		return
 	}
 	if message.Self() {
@@ -53,33 +46,27 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if message.Age() > 2*60*time.Second {
-		log.Errorf("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
+		log.Infof("Age: [%v] CoptRight: [%v]", message.Age()/(60*time.Second), Copyright(make([]uintptr, 1)))
 		return
 	}
 
-	if result, err = json.Marshal(m); err != nil {
-		log.Errorf("[ExportMessages] Json 解析失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
+	if err = db.Table(message.Date().Format("2006-01")).AutoMigrate(&MessageInfo{}); err != nil {
+		log.Errorf("自动创建表失败, %s", err)
 		return
 	}
-	if _, err = os.Stat(filename); err != nil {
-		log.Errorf("[ExportMessages] 聊天备份文件不存在,正在创建! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-	}
-	if fp, err = os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755); err != nil {
-		log.Errorf("[ExportMessages] 打开聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-	}
-	defer func(fp *os.File) {
-		if err = fp.Close(); err != nil {
-			log.Errorf("[ExportMessages] 关闭聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-		}
-	}(fp)
-	if _, err = fp.Write(result); err != nil {
-		log.Errorf("[ExportMessages] 写入聊天记录到聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
+	if err = db.Table(message.Date().Format("2006-01")).Create(&m).Error; err != nil {
+		log.Errorf("写入数据失败, %s", err)
 		return
 	}
-	if _, err = fp.WriteString("\n"); err != nil {
-		log.Errorf("[ExportMessages] 写入换行符到聊天备份文件失败! Error: [%v] CoptRight: [%s]", err, Copyright(make([]uintptr, 1)))
-		return
-	}
-	log.Infof("%s  CoptRight: [%s]", m.AutoInfo, Copyright(make([]uintptr, 1)))
-	context.SetData("msgInfo", m)
+}
+
+func onLogin(context *wechaty.Context, user *user.ContactSelf) {
+	db, err = gorm.Open(mysql.New(mysql.Config{
+		DSN:                       viper.GetString("MYSQL.HOST"), // DSN data source name
+		DefaultStringSize:         256,                           // string 类型字段的默认长度
+		DisableDatetimePrecision:  true,                          // 禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
+		DontSupportRenameIndex:    true,                          // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
+		DontSupportRenameColumn:   true,                          // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
+		SkipInitializeWithVersion: false,                         // 根据当前 MySQL 版本自动配置
+	}), &gorm.Config{})
 }

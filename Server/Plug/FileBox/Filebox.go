@@ -14,7 +14,7 @@ var (
 	err error
 )
 
-func FileBox() *wechaty.Plugin {
+func New() *wechaty.Plugin {
 	plug := wechaty.NewPlugin()
 	plug.OnMessage(onMessage)
 	return plug
@@ -26,7 +26,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 		return
 	}
 	if message.Type() == schemas.MessageTypeRecalled {
-		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		return
 	}
 
@@ -49,7 +49,7 @@ func onMessage(context *wechaty.Context, message *user.Message) {
 	MessageTypeVideo
 	*/
 	if message.Type() == schemas.MessageTypeUnknown && message.Talker().Name() == "微信团队" {
-		log.Errorf("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
+		log.Infof("Type Pass, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
 		return
 	}
 	log.Infof("FileBox, Type: [%v]:[%v] CoptRight: [%s]", message.Type().String(), message.Talker().Name(), Copyright(make([]uintptr, 1)))
