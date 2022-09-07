@@ -12,6 +12,7 @@ import (
 	"github.com/wechaty/go-wechaty/wechaty/user"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 	. "wechatBot/General"
 )
@@ -34,6 +35,9 @@ func New() *wechaty.Plugin {
 			return
 		}
 		if message.Type() != schemas.MessageTypeText {
+			return
+		}
+		if !strings.Contains(message.Text(), "节日祝福") {
 			return
 		}
 		if message.Text()[0:13] == "节日祝福 " {

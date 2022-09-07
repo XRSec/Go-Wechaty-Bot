@@ -83,6 +83,9 @@ func main() {
 		if message.Type() != schemas.MessageTypeText {
 			return
 		}
+		if !strings.Contains(message.Text(), "节日祝福") {
+			return
+		}
 		if message.Text()[0:13] == "节日祝福 " {
 			if _, err = os.Stat("friend.json"); err != nil {
 				getAllToFile(message.GetWechaty().Contact())
