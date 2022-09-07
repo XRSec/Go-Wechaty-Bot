@@ -1,5 +1,5 @@
 .idea
-test
+Server/test/test
 config.yaml
 tmp
 main.exe
@@ -11,3 +11,4 @@ logs
 node_modules
 package-lock.json
 yarn.lock
+screenlog.*
