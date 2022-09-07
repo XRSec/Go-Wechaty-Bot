@@ -110,4 +110,4 @@ flowchart LR
 
 Reply to group chat with us
 
-![wxid: XRSec_MSG](Image/bot.png)
+![wxid: Tencent-IoT-Lab](Image/bot.jpg)
