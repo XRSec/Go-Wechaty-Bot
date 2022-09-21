@@ -1,0 +1,6 @@
+[submodule "xp"]
+	path = xp
+	url = git@github.com:XRSec/Go-Wechaty-Bot-XP.git
+[submodule "Server/Plug"]
+	path = Server/Plug
+	url = git@github.com:XRSec/Go-Wechaty-Bot-Plugin.git

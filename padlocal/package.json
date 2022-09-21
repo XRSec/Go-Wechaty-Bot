@@ -1,0 +1,18 @@
+{
+  "name": "go-wechaty-bot",
+  "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/XRSec/Go-Wechaty-Bot.git",
+  "url" : "https://xrsec.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XRSec/Go-Wechaty-Bot.git"
+  },
+  "dependencies": {
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-padlocal": "^1.20.1"
+  },
+  "scripts": {
+    "serve": "node_modules/.bin/wechaty gateway --puppet ${WECHATY_PUPPET} --port ${WECHATY_PUPPET_SERVER_PORT} --token ${WECHATY_TOKEN} --puppet-token ${WECHATY_PUPPET_PADLOCAL_TOKEN}"
+  }
+}

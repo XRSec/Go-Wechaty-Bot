@@ -1,0 +1,111 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseName:
+        description: 'Set release name'
+        required: true
+        default: "Use Go & SDK Wechaty"
+      tagName:
+        description: 'Set tag name'
+        required: false
+        type: string
+  # watch:
+  #   types: [started]
+
+jobs:
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Private Actions Checkout
+        uses: actions/checkout@v3
+      -
+        name: Get Data
+        id: time
+        run: echo "::set-output name=dir::$(date +'%Y-%m-%d/%H:%M:%S')"
+      -
+        name: Get commitId
+        id: commitId
+        run:
+          git submodule init
+          git submodule update
+          echo "::set-output name=dir::$(git rev-parse HEAD)"
+      -
+        name: Build with xgo
+        uses: crazy-max/ghaction-xgo@v2
+        with:
+          xgo_version: latest
+          go_version: ${{ matrix.go_version }}
+          dest: bin
+          prefix: Go-Wechaty-Bot
+          targets: android/386, android/amd64, android/arm, android/arm64, darwin/amd64, darwin/arm64, freebsd/386, freebsd/amd64, freebsd/arm, freebsd/arm64, linux/386, linux/amd64, linux/arm, linux/arm64, linux/mips, linux/mips64, linux/mips64le, linux/mipsle, linux/ppc64, linux/ppc64le, linux/riscv64, linux/s390x, netbsd/386, netbsd/amd64, netbsd/arm, netbsd/arm64, openbsd/386, openbsd/amd64, openbsd/arm, openbsd/arm64, openbsd/mips64, windows/386, windows/amd64, windows/arm, windows/arm64
+          v: false
+          x: false
+          race: false
+          ldflags: -s -w -X main.buildTime=${{ steps.time.outputs.dir }} -X main.version=${{ github.event.inputs.tagName }} -X main.commitId=${{ steps.commitId.outputs.dir }} -X main.author=XRSec
+          buildmode: default
+          working_dir: Server
+      -
+        name: Delete old Releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          repo: ${{ github.repository }}
+          keep_latest: 3
+          delete_tag_pattern: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      -
+        name: Make release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "Server/bin/**"
+          body_path: docs/Update.md
+          name: ${{ github.event.inputs.releaseName }}
+          tag_name: ${{ github.event.inputs.tagName }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+      -
+        name: Get Data 
+        id: getDingData
+        run: |
+          set -ex
+          # 输出仓库名
+          REPOSITORY="${{GITHUB.REPOSITORY}}"
+          echo "::set-output name=REPOSITORY::${REPOSITORY#*/}"
+          
+          # 获取用户仓库信息
+          # RESPONSE="$(curl -sLm 10 https://api.github.com/repos/${{ GITHUB.REPOSITORY }})"
+          # 建议填写自己的 TOKEN
+          RESPONSE="$(curl -sLm 10 https://api.github.com/repos/${{ GITHUB.REPOSITORY }} -H "Authorization: token ${{ SECRETS.TOKEN_GITHUB }}")"
+          
+          # 获取 用户仓库 设置的 描述，如果为空，可能是没有使用 TOKEN
+          DESCRIPTION="$(jq -r .description <(echo ${RESPONSE}))"
+          echo "::set-output name=DESCRIPTION::${DESCRIPTION}"
+
+          # 获取 用户仓库 设置的 URL, 如果没有就输出 Github 地址
+          URL="$(jq -r .homepage <(echo ${RESPONSE}))"
+          if [[ "${URL}" == "null" || "${URL}" == "" ]]; then
+            echo "::set-output name=URL::${{ GITHUB.SERVER_URL }}/${{ GITHUB.REPOSITORY }}"
+          else
+            echo "::set-output name=URL::${URL}"
+          fi
+      -
+        name: Send dingding notify
+        uses: zcong1993/actions-ding@master
+        with:
+          dingToken: ${{ SECRETS.DING_TOKEN }}
+          secret: ${{ SECRETS.DING_SECRET }}
+          body: |
+            {
+              "msgtype": "link",
+              "link": {
+                  "text": "${{ steps.getDingData.outputs.DESCRIPTION }}",
+                  "title":  "${{ steps.getDingData.outputs.REPOSITORY }} WorkFlow ${{ GITHUB.JOB }} Success!",
+                  "picUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                  "messageUrl": "${{ steps.getDingData.outputs.URL }}"
+              }
+            }

@@ -1,0 +1,23 @@
+name: updated docs server
+
+on:
+  push:
+    branches: [ main ]
+    paths:   # 这里是用来指定哪个文件更改，才会触发的
+      - 'docs/**'
+      - '4u/**'
+      - 'padlocal/**'
+      - 'xp/**'
+
+jobs:
+  Send_Message:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          repository: ${{ github.repository_owner }}/Go-Wechaty-Bot
+          event-type: The beta version is updated
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

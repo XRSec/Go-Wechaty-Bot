@@ -1,0 +1,34 @@
+name: updated docs client
+
+on:
+  repository_dispatch:
+    types: ["The beta version is updated"]
+
+jobs:
+  Receive_Message:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Private Actions Checkout
+        uses: actions/checkout@v3
+        with:
+          path: Go-Wechaty-Bot
+      -
+        name: Private Actions Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.repository_owner }}/gobot
+          token: ${{ secrets.TOKEN_GITHUB }}
+          path: gobot
+      -
+        name: Upgrade Docs
+        run: |
+          cd gobot
+          event_type=$(git log --pretty=format:“%s” $(git rev-parse HEAD) -1 | awk '{print}')
+          rm -rf .git
+          cp -r ../Go-Wechaty-Bot/.git .
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add --all -- ':!Server'
+          git commit -m ${event_type} -a
+          git push

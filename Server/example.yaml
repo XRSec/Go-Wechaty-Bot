@@ -1,0 +1,42 @@
+BOT:
+  ADMINID: wxid_xxxxx
+  NAME: xxxxxxxx
+  GROUP: Debug
+  Docker: Go-Wechaty-Bot
+#SYSLOG:
+#  STATUS: false
+#  PROTOCOL: udp
+#  REMOTE_ADDRESS:  localhost:514
+WECHATY:
+  GATEWAY: false
+  WECHATY_ENDPOINT: 127.0.0.1:25000
+  WECHATY_LOG: verbose
+  WECHATY_PUPPET_PADLOCAL_TOKEN: puppet_padlocal_xxxxxxxxxxxxxxxxxx
+  WECHATY_PUPPET_SERVER_PORT: 25000
+  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT: true
+  WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_SERVER: true
+  WECHATY_TOKEN: insecure_xxxxxxxxxxxxxxxxxxxxxx
+
+GROUP:
+  LISTS:
+    xxxxx@chatroom: xxxxx
+  PASS:
+    xxxxx@chatroom: true
+
+DING:
+  SECRET: xxxxxxxxxxxxxxxxxx
+  TOKEN: xxxxxxxxxxxxxxxxxx
+WXOPENAI:
+  ENV: online
+  SIGNURL: https://openai.weixin.qq.com/openapi/sign/
+  URL: https://openai.weixin.qq.com/openapi/aibot/
+  TOKEN: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TULING:
+  TOKEN: xxxxxxxxxxxxxxxx&info=
+  URL: http://www.tuling123.com/openapi/api?key=
+QingYunKe:
+  AppID: 0
+  Key: free
+  URL: https://api.qingyunke.com/api.php?key=free&appid=0&msg=
+MYSQL:
+  HOST: user:name@tcp(ip:port)/database_name?charset=utf8mb4&parseTime=True&loc=Local

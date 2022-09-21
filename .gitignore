@@ -1,0 +1,15 @@
+.idea
+Server/test/test
+config.yaml
+tmp
+main.exe
+data.json
+test.sh
+.vscode
+logs
+*.memory-card.json
+node_modules
+package-lock.json
+yarn.lock
+screenlog.*
+friendExist.txt
