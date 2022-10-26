@@ -35,8 +35,7 @@ flowchart LR
    ```bash
    git clone https://github.com/XRSec/Go-Wechaty-Bot.git
    cd Go-Wechaty-Bot
-   git submodule update --init
-   git submodule update --remote
+   git submodule update --init --recursive
    ```
 
 2. Install the Packages ( [! Docker](https://github.com/XRSec/Go-Wechaty-Bot/blob/main/padlocal/wechatyGateway.sh))
