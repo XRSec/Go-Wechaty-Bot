@@ -22,5 +22,5 @@ git commit -am "update"
 cd ../..
 git add .
 git commit -am "update"
-git push
+git push --recurse-submodules=on-demand
 ```
