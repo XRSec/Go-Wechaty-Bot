@@ -8,14 +8,14 @@ git submodule update --init --recursive
 ## 更新本地代码
 
 ```bash
-git submodule update --recursive --remote
+git submodule update --recursive
 ```
 
 ## 开发者
 
 ```bash
 cd Server/Plug
-git submodule update --recursive --remote
+git submodule update --recursive
 git checkout main
 git add .
 git commit -am "update"
