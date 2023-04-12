@@ -5,6 +5,7 @@ import (
 	. "github.com/XRSec/Go-Wechaty-Bot/General"
 	"github.com/XRSec/Go-Wechaty-Bot/Plug/Admin"
 	"github.com/XRSec/Go-Wechaty-Bot/Plug/Average"
+	"github.com/XRSec/Go-Wechaty-Bot/Plug/CodeAuth"
 	"github.com/XRSec/Go-Wechaty-Bot/Plug/Cron"
 	"github.com/XRSec/Go-Wechaty-Bot/Plug/DingMessage"
 	ExportMessages "github.com/XRSec/Go-Wechaty-Bot/Plug/ExportMessage"
@@ -58,8 +59,8 @@ func onScan(context *Context, qrCode string, status schemas.ScanStatus, data str
 }
 
 /*
-	@method onLogin 当机器人成功登陆后，会触发事件，并会在事件中传递当前登陆机器人的信息
-	@param {*} user
+@method onLogin 当机器人成功登陆后，会触发事件，并会在事件中传递当前登陆机器人的信息
+@param {*} user
 */
 func onLogin(context *Context, user *user.ContactSelf) {
 	fmt.Printf(`%v
@@ -80,7 +81,8 @@ func onLogin(context *Context, user *user.ContactSelf) {
 	viper.Set("bot.name", user.Name())
 }
 
-/**
+/*
+*
 @method onLogout 当机器人检测到登出的时候，会触发事件，并会在事件中传递机器人的信息。
 @param {*} user
 */
@@ -89,8 +91,8 @@ func onLogout(context *Context, user *user.ContactSelf, reason string) {
 }
 
 /*
-  @method onRoomInvite 当收到群邀请的时候，会触发这个事件。
-  @param {*} user
+@method onRoomInvite 当收到群邀请的时候，会触发这个事件。
+@param {*} user
 */
 func onRoomInvite(context *Context, roomInvitation *user.RoomInvitation) {
 	fmt.Println("========================onRoomInvite👇========================")
@@ -116,16 +118,16 @@ func onRoomInvite(context *Context, roomInvitation *user.RoomInvitation) {
 }
 
 /*
-	@method onRoomTopic 当有人修改群名称的时候会触发这个事件。
-	@param {*} user
+@method onRoomTopic 当有人修改群名称的时候会触发这个事件。
+@param {*} user
 */
 func onRoomTopic(context *Context, room *user.Room, newTopic string, oldTopic string, changer _interface.IContact, date time.Time) {
 	fmt.Println("========================onRoomTopic👇========================")
 }
 
 /*
-	@method onRoomleave 当机器人把群里某个用户移出群聊的时候会触发这个时间。用户主动退群是无法检测到的。
-	@param {*} user
+@method onRoomleave 当机器人把群里某个用户移出群聊的时候会触发这个时间。用户主动退群是无法检测到的。
+@param {*} user
 */
 func onRoomleave(context *Context, room *user.Room, leaverList []_interface.IContact, remover _interface.IContact, date time.Time) {
 	fmt.Println("========================onRoomleave👇========================")
@@ -207,6 +209,7 @@ func wechatBotDaemon() {
 			Use(GroupForward.New()).
 			Use(Admin.New()).
 			Use(Average.New()).
+			Use(CodeAuth.New()).
 			//Use(AutoReply.New()).
 			Use(FileBox.New()).
 			Use(ExportMessages.New()).
