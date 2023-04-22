@@ -29,7 +29,7 @@ jobs:
       -
         name: Get commitId
         id: commitId
-        run:
+        run: |
           git submodule init
           git submodule update
           echo "dir=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
@@ -68,8 +68,7 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-      -
-        name: Get Data 
+      - name: Get Data
         id: getDingData
         run: |
           set -ex
@@ -93,7 +92,7 @@ jobs:
           else
             echo "URL=${URL}" >> $GITHUB_OUTPUT
           fi
-      - 
+      -
         name: Send dingding notify
         uses: zcong1993/actions-ding@master
         with:
