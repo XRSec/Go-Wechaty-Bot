@@ -15,7 +15,7 @@ jobs:
     steps:
       -
         name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.TOKEN_GITHUB }}
           repository: ${{ github.repository_owner }}/Go-Wechaty-Bot
